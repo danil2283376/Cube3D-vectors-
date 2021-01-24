@@ -6,7 +6,7 @@
 /*   By: scolen <scolen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 15:13:51 by scolen            #+#    #+#             */
-/*   Updated: 2021/01/21 17:40:06 by scolen           ###   ########.fr       */
+/*   Updated: 2021/01/24 11:27:48 by scolen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,6 +70,10 @@ typedef struct s_object_on_scene
 	float 				width_screen;
 	float				heigth_screen;
 	float             fov;
+
+	unsigned int **buffer;
+	int **texture;
+
 
 	t_info_image window;
 	t_info_image floor;

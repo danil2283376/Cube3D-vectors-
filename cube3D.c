@@ -9,6 +9,8 @@
 
 #define screenWidth 1920
 #define screenHeight 1080
+#define texWidth 64
+#define texHeight 64
 #define mapWidth 24
 #define mapHeight 24
 
@@ -48,12 +50,14 @@ void            my_mlx_pixel_put(t_info_image *img, int x, int y, int color)
     *(unsigned int *)dst = color;
 }
 
-int threatment_color(t_object_on_scene *obj)
+int threatment_color(int r, int g, int b)
 {
-  // printf("r:%d, g:%d, b:%d\n", obj->s_value_from_map.floor_color_r, obj->s_value_from_map.floor_color_g, obj->s_value_from_map.floor_color_b);
-  return (obj->s_value_from_map.floor_color_r
-    || obj->s_value_from_map.floor_color_g
-    || obj->s_value_from_map.floor_color_b);
+  return (r << 16 | g << 8 | b);
+}
+
+void drawBuffer(unsigned int *buffer)
+{
+
 }
 
 int rebuild_scene(t_object_on_scene *objects)
@@ -112,57 +116,116 @@ int rebuild_scene(t_object_on_scene *objects)
       while (hit == 0)
       {
         //jump to next map square, OR in x-direction, OR in y-direction
-        if(sideDistX < sideDistY)
+        if (sideDistX < sideDistY)
         {
           sideDistX += deltaDistX;
           mapX += stepX;
-          side = 0;
+          side = 0; // попадание по Y
         }
         else
         {
           sideDistY += deltaDistY;
           mapY += stepY;
-          side = 1;
+          side = 1; // попадание по X
         }
         //Check if ray has hit a wall
-        if(worldMap[mapX][mapY] > 0) hit = 1;
+        if(worldMap[mapX][mapY] > 0)
+        {
+          // printf("worldMap: %d\n", worldMap[mapX][mapY]);
+          hit = 1;
+        }
       }
+      // printf("stepX: %d, stepY: %d\n", stepX, stepY);
       //Calculate distance projected on camera direction (Euclidean distance will give fisheye effect!)
-      if(side == 0) perpWallDist = (mapX - objects->player_position_x + (1 - stepX) / 2) / rayDirX;
+      if (side == 0) perpWallDist = (mapX - objects->player_position_x + (1 - stepX) / 2) / rayDirX;
       else          perpWallDist = (mapY - objects->player_position_y + (1 - stepY) / 2) / rayDirY;
+
+      // int a = mapWidth * mapWidth * mapWidth;
+      // else if (side == 0)
+      //   color = 0xFFFFFF;
+      // else if (side == 1)
+      //   color = 0x000000;
+      // printf("worldMap: %d\n", worldMap[mapY][mapX]);
+      // else
+      //   color = 0x000000;
 
       //Calculate height of line to draw on screen
       int lineHeight = (int)(h / perpWallDist);
 
       //calculate lowest and highest pixel to fill in current stripe
       int drawStart = -lineHeight / 2 + h / 2;
-      if(drawStart < 0)drawStart = 0;
+      if(drawStart < 0) drawStart = 0;
       int drawEnd = lineHeight / 2 + h / 2;
-      if(drawEnd >= h)drawEnd = h - 1;
-        for (int y = 0; y < h; y++)
+      if(drawEnd >= h) drawEnd = h - 1;
+      for (int y = 0; y < h; y++)
+      {
+        if (y < drawStart)
+          my_mlx_pixel_put(&objects->window, x, y, threatment_color(objects->s_value_from_map.ceilling_color_r, objects->s_value_from_map.ceilling_color_g, objects->s_value_from_map.ceilling_color_b));
+        if (y >= drawStart && y <= drawEnd)
         {
-          if (y < drawStart)
-            my_mlx_pixel_put(&objects->window, x, y, 0x00bfff);
-          if (y >= drawStart && y <= drawEnd)
+          if (side == 0) // N OR S
           {
-            if (side == 0)
-                my_mlx_pixel_put(&objects->window, x, y, 0xFF0000);
-            else
-                my_mlx_pixel_put(&objects->window, x, y, 0x00FF00);
+            if (stepX > 0)
+              my_mlx_pixel_put(&objects->window, x, y, 0x808080);
+            else if (stepX < 0)
+               my_mlx_pixel_put(&objects->window, x, y, 0xFF0000);
           }
-          if (y > drawEnd)
-            my_mlx_pixel_put(&objects->window, x, y, threatment_color(objects));
+          else if (side == 1) // W OR E
+          {
+            if (stepY > 0)
+              my_mlx_pixel_put(&objects->window, x, y, 0x0000FF);
+            else if (stepY < 0)
+              my_mlx_pixel_put(&objects->window, x, y, 0xFFFFFF);
+          }
         }
+        if (y > drawEnd)
+          my_mlx_pixel_put(&objects->window, x, y, threatment_color(objects->s_value_from_map.floor_color_r, objects->s_value_from_map.floor_color_g, objects->s_value_from_map.floor_color_b));
+      }
       //choose wall color
       //draw the pixels of the stripe as a vertical line
+
+// //texturing calculations
+//         int texNum = worldMap[mapX][mapY] - 1; //1 subtracted from it so that texture 0 can be used!
+
+//         //calculate value of wallX
+//         double wallX; //where exactly the wall was hit
+//         if (side == 0) wallX = objects->player_position_y + perpWallDist * rayDirY;
+//         else           wallX = objects->player_position_x + perpWallDist * rayDirX;
+//         wallX -= floor((wallX));
+
+//         //x coordinate on the texture
+//         int texX = (int)(wallX * (double)(texWidth));
+//         if(side == 0 && rayDirX > 0) texX = texWidth - texX - 1;
+//         if(side == 1 && rayDirY < 0) texX = texWidth - texX - 1;
+
+//               // How much to increase the texture coordinate per screen pixel
+//         double step = 1.0 * texHeight / lineHeight;
+//         // Starting texture coordinate
+//         double texPos = (drawStart - h / 2 + lineHeight / 2) * step;
+//         for(int y = drawStart; y<drawEnd; y++)
+//         {
+//           // Cast the texture coordinate to integer, and mask with (texHeight - 1) in case of overflow
+//           int texY = (int)texPos & (texHeight - 1);
+//           texPos += step;
+//           unsigned int color = objects->texture[texNum][texHeight * texY + texX];
+//           //make color darker for y-sides: R, G and B byte each divided through two with a "shift" and an "and"
+//           if(side == 1) color = (color >> 1) & 8355711;
+//           objects->buffer[y][x] = color;
+//         }
+
+//       drawBuffer(objects->buffer[0]);
+//       for(int y = 0; y < h; y++)
+//         for(int x = 0; x < w; x++)
+//          objects->buffer[y][x] = 0;
     }
-    printf("x = %f, y = %f\n", objects->player_position_x, objects->player_position_y);
+    // printf("x = %f, y = %f\n", objects->player_position_x, objects->player_position_y);
     return (1);
 }
 
 int				key_hook(int keycode, t_object_on_scene *obj)
 {
-  printf("keycode: %d\n", keycode);
+  // printf("x: %f, y: %f\n", obj->planeX, obj->planeY);
+  // printf("x: %f, y: %f\n", obj->player_direction_x, obj->player_direction_y);
   double moveSpeed = 0.1; //the constant value is in squares/second
   double rotSpeed = 0.05; // speed rotation
   if (keycode == 53)
@@ -178,11 +241,27 @@ int				key_hook(int keycode, t_object_on_scene *obj)
   }
   if (keycode == 1) // down
   {
-    if (worldMap[(int)(obj->player_position_x - obj->player_direction_x / obj->speed)][(int)(obj->player_position_y)] == 0)
-      obj->player_position_x -= obj->player_direction_x / obj->speed;
-    if (worldMap[(int)(obj->player_position_x)][(int)(obj->player_position_y - obj->player_direction_y / obj->speed)] == 0)
-      obj->player_position_y -= obj->player_direction_y / obj->speed;
+    if (worldMap[(int)(obj->player_position_x - obj->player_direction_x * moveSpeed)][(int)(obj->player_position_y)] == 0)
+      obj->player_position_x -= obj->player_direction_x * moveSpeed;
+    if (worldMap[(int)(obj->player_position_x)][(int)(obj->player_position_y - obj->player_direction_y * moveSpeed)] == 0)
+      obj->player_position_y -= obj->player_direction_y * moveSpeed;
   }
+  if (keycode == 0) // влево
+  {
+    // printf("obj->player_position_x + obj->planeX = %f\n", obj->player_position_x + obj->planeX);
+    if(worldMap[(int)(obj->player_position_x)][(int)(obj->player_position_y + obj->player_direction_x * moveSpeed)] == 0)
+      obj->player_position_y += obj->player_direction_x * moveSpeed;
+    if(worldMap[(int)(obj->player_position_x - obj->player_direction_y * moveSpeed)][(int)(obj->player_position_y)] == 0)
+      obj->player_position_x -= obj->player_direction_y * moveSpeed;
+  }
+  if (keycode == 2) // вправо
+  {
+    if(worldMap[(int)(obj->player_position_x)][(int)(obj->player_position_y - obj->player_direction_x * moveSpeed)] == 0)
+      obj->player_position_y -= obj->player_direction_x * moveSpeed;
+    if(worldMap[(int)(obj->player_position_x + obj->player_direction_y * moveSpeed)][(int)(obj->player_position_y)] == 0)
+      obj->player_position_x += obj->player_direction_y * moveSpeed;
+  }
+
   if(keycode == 124) // стрелочка вправо
     {
       //both camera direction and camera plane must be rotated
@@ -224,6 +303,21 @@ int main()
     void *win = mlx_new_window(mlx, screenWidth, screenHeight, "Cube3D");
     int h = screenHeight;
     int w = screenWidth;
+
+    // new
+    // unsigned int buffer[screenHeight][screenWidth];
+    // int texture[8][texWidth * texHeight];
+
+    // unsigned int **buffer = malloc(screenHeight);
+    // for (int i = 0; i < screenHeight; i++)
+    //   buffer[i] = malloc(texWidth * sizeof(unsigned int));
+    // int **texture = malloc(8 * sizeof(int));
+    // for (int i = 0; i < 8 ; i++)
+    //   texture[i] = malloc(texWidth * texHeight);
+
+
+    // objects.buffer = buffer;
+    // objects.texture = texture;
     // t_info_image window;
     objects.player_position_x = 22;
     objects.player_position_y = 12;  //x and y start position
