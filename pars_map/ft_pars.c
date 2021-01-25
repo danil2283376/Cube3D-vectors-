@@ -6,7 +6,7 @@
 /*   By: scolen <scolen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 13:15:09 by scolen            #+#    #+#             */
-/*   Updated: 2021/01/06 11:39:03 by scolen           ###   ########.fr       */
+/*   Updated: 2021/01/25 18:34:50 by scolen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,9 +67,7 @@ int		is_map(char *line)
 	while (line[start] == ' ' || line[start] == '\t')
 		line++;
 	if (line[start] == '1' || line[start] == '0')
-	{
 		return (1);
-	}
 	else
 	{
 		// printf("str = %s\n", line);
@@ -80,8 +78,8 @@ int		is_map(char *line)
 char	*threatment_map(char *line, char *map, t_value_from_map *value_map)
 {
 	int line_start;
-	(void)value_map;
 	char *new_line;
+	(void)value_map;
 
 	line_start = 0;
 	new_line = ft_strdup(line);
@@ -92,7 +90,7 @@ char	*threatment_map(char *line, char *map, t_value_from_map *value_map)
 	new_line[line_start] = '*';
 	new_line[line_start + 1] = '\0';
 	line_start = 0;
-		map = ft_strjoin(map, new_line);
+	map = ft_strjoin(map, new_line);
 	return (map);
 }
 
@@ -131,7 +129,6 @@ char	**manage_function(int fd, t_value_from_map *value_map)
 		}
 		free(line);
 	}
-	return (matrix_map = ft_split(map, '*'));
 	// printf("Resolution: x = %d, y = %d\n", value_map->resolution_x, value_map->resolution_y);
 	// printf("North = %s\n", value_map->north_texture);
 	// printf("South = %s\n", value_map->south_texture);
@@ -144,4 +141,5 @@ char	**manage_function(int fd, t_value_from_map *value_map)
 	// printf("Floor_r = %d\n", value_map->floor_color_r);
 	// printf("Floor_g = %d\n", value_map->floor_color_g);
 	// printf("Floor_b = %d\n", value_map->floor_color_b);
+	return (matrix_map = ft_split(map, '*'));
 }

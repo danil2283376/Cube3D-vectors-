@@ -129,7 +129,7 @@ int rebuild_scene(t_object_on_scene *objects)
           side = 1; // попадание по X
         }
         //Check if ray has hit a wall
-        if(worldMap[mapX][mapY] > 0)
+        if(objects->map[mapX][mapY] != '0')
         {
           // printf("worldMap: %d\n", worldMap[mapX][mapY]);
           hit = 1;
@@ -233,32 +233,32 @@ int				key_hook(int keycode, t_object_on_scene *obj)
   if (keycode == 13) // up
   {
     // write(1, "1", 1);
-    if(worldMap[(int)(obj->player_position_x + obj->player_direction_x * moveSpeed)][(int)(obj->player_position_y)] == 0)
+    if (obj->map[(int)(obj->player_position_x + obj->player_direction_x * moveSpeed)][(int)(obj->player_position_y)] == '0')
       obj->player_position_x += obj->player_direction_x * moveSpeed;
-    if(worldMap[(int)(obj->player_position_x)][(int)(obj->player_position_y + obj->player_direction_y * moveSpeed)] == 0)
+    if (obj->map[(int)(obj->player_position_x)][(int)(obj->player_position_y + obj->player_direction_y * moveSpeed)] == '0')
         obj->player_position_y += obj->player_direction_y * moveSpeed;
     // printf("x = %f, y = %f\n", obj->player_position_x, obj->player_position_y);
   }
   if (keycode == 1) // down
   {
-    if (worldMap[(int)(obj->player_position_x - obj->player_direction_x * moveSpeed)][(int)(obj->player_position_y)] == 0)
+    if (obj->map[(int)(obj->player_position_x - obj->player_direction_x * moveSpeed)][(int)(obj->player_position_y)] == '0')
       obj->player_position_x -= obj->player_direction_x * moveSpeed;
-    if (worldMap[(int)(obj->player_position_x)][(int)(obj->player_position_y - obj->player_direction_y * moveSpeed)] == 0)
+    if (obj->map[(int)(obj->player_position_x)][(int)(obj->player_position_y - obj->player_direction_y * moveSpeed)] == '0')
       obj->player_position_y -= obj->player_direction_y * moveSpeed;
   }
   if (keycode == 0) // влево
   {
     // printf("obj->player_position_x + obj->planeX = %f\n", obj->player_position_x + obj->planeX);
-    if(worldMap[(int)(obj->player_position_x)][(int)(obj->player_position_y + obj->player_direction_x * moveSpeed)] == 0)
+    if(obj->map[(int)(obj->player_position_x)][(int)(obj->player_position_y + obj->player_direction_x * moveSpeed)] == '0')
       obj->player_position_y += obj->player_direction_x * moveSpeed;
-    if(worldMap[(int)(obj->player_position_x - obj->player_direction_y * moveSpeed)][(int)(obj->player_position_y)] == 0)
+    if(obj->map[(int)(obj->player_position_x - obj->player_direction_y * moveSpeed)][(int)(obj->player_position_y)] == '0')
       obj->player_position_x -= obj->player_direction_y * moveSpeed;
   }
   if (keycode == 2) // вправо
   {
-    if(worldMap[(int)(obj->player_position_x)][(int)(obj->player_position_y - obj->player_direction_x * moveSpeed)] == 0)
+    if(obj->map[(int)(obj->player_position_x)][(int)(obj->player_position_y - obj->player_direction_x * moveSpeed)] == '0')
       obj->player_position_y -= obj->player_direction_x * moveSpeed;
-    if(worldMap[(int)(obj->player_position_x + obj->player_direction_y * moveSpeed)][(int)(obj->player_position_y)] == 0)
+    if(obj->map[(int)(obj->player_position_x + obj->player_direction_y * moveSpeed)][(int)(obj->player_position_y)] == '0')
       obj->player_position_x += obj->player_direction_y * moveSpeed;
   }
 
@@ -293,6 +293,31 @@ int				key_hook(int keycode, t_object_on_scene *obj)
   return (1);
 }
 
+// определение направление взгляда
+void  cardinal_points(t_object_on_scene *objects)
+{
+  if (objects->cardinal_point == 'N') // смотрит вверх
+  {
+    objects->player_direction_y = 1;
+    objects->planeX = 0.66;
+  }
+  if (objects->cardinal_point == 'S') // смотрит вниз
+  {
+    objects->player_direction_y = -1;
+    objects->planeX = -0.66;
+  }
+  if (objects->cardinal_point == 'W') // смотрет влево
+  {
+    objects->player_direction_x = -1;
+    objects->planeY = 0.66;
+  }
+  if (objects->cardinal_point == 'E') // смотрит вправо
+  {
+    objects->player_direction_x = 1;
+    objects->planeY = -0.66;
+  }
+}
+
 int main()
 {
     int fd = open("map.cub", O_RDONLY);
@@ -303,7 +328,13 @@ int main()
     void *win = mlx_new_window(mlx, screenWidth, screenHeight, "Cube3D");
     int h = screenHeight;
     int w = screenWidth;
+    // while (img[i][j])
+    // {
+    //   while ()
+    //   {
 
+    //   }
+    // }
     // new
     // unsigned int buffer[screenHeight][screenWidth];
     // int texture[8][texWidth * texHeight];
@@ -321,16 +352,45 @@ int main()
     // t_info_image window;
     objects.player_position_x = 22;
     objects.player_position_y = 12;  //x and y start position
-    objects.player_direction_x = -1;
-    objects.player_direction_y = 0; //initial direction vector
-    objects.planeX = 0;
-    objects.planeY = 0.66; //the 2d raycaster version of camera plane
+    int i = 0;
+    int j = 0;
+    while (objects.map[i] != NULL)
+    {
+      while (objects.map[i][j] != '\0')
+      {
+        if (objects.map[i][j] == 'N' || objects.map[i][j] == 'W' || objects.map[i][j] == 'E'
+          || objects.map[i][j] == 'S')
+        {
+          objects.player_position_x = i;
+          objects.player_position_y = j;
+          objects.cardinal_point = objects.map[i][j];
+        }
+        j++;
+      }
+      i++;
+      j = 0;
+    }
+    objects.map[(int)(objects.player_position_x)][(int)(objects.player_position_y)] = '0';
+    printf("x: %f, y: %f\n", objects.player_position_x, objects.player_position_y);
+    // objects.player_direction_x = 0;
+    // objects.player_direction_y = 1; //initial direction vector
+    // objects.planeX = 0.66;
+    // objects.planeY = 0; //the 2d raycaster version of camera plane
+    cardinal_points(&objects);
+    char *relative_path = objects.s_value_from_map.south_texture;
+    int wid;
+    int height;
+    void *img = mlx_xpm_file_to_image(mlx, relative_path, &wid, &height);
     objects.speed = 5;
     objects.mlx = mlx;
     objects.win = win;
     objects.window.img = mlx_new_image(mlx, w, h);
        objects.window.addr = mlx_get_data_addr(objects.window.img, &objects.window.bits_per_pixel,
            &objects.window.line_length, &objects.window.endian);
+
+       objects.texture.addr = mlx_get_data_addr(img, &objects.texture.bits_per_pixel,
+           &objects.texture.line_length, &objects.texture.endian);
+           write(1, "1", 1);
     rebuild_scene(&objects);
     mlx_put_image_to_window(mlx, win, objects.window.img, 0, 0);
     // mlx_loop_hook(mlx, rebuild_scene, &objects);

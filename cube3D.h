@@ -6,7 +6,7 @@
 /*   By: scolen <scolen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 15:13:51 by scolen            #+#    #+#             */
-/*   Updated: 2021/01/24 11:27:48 by scolen           ###   ########.fr       */
+/*   Updated: 2021/01/25 19:01:30 by scolen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,7 @@ typedef struct  s_info_image
 
 typedef struct s_object_on_scene
 {
+	t_info_image texture;
 	t_value_from_map s_value_from_map;
 	t_info_image	player;
 	int				map_hide;
@@ -67,12 +68,12 @@ typedef struct s_object_on_scene
 	float			rot_speed;
 	float			min_angle;
 	float			max_angle;
-	float 				width_screen;
-	float				heigth_screen;
-	float             fov;
+	float 			width_screen;
+	float			heigth_screen;
+	float			fov;
+	char			cardinal_point;
 
 	unsigned int **buffer;
-	int **texture;
 
 
 	t_info_image window;
