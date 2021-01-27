@@ -14,34 +14,6 @@
 #define mapWidth 24
 #define mapHeight 24
 
-int worldMap[mapWidth][mapHeight]=
-{
-  {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,2,2,2,2,2,0,0,0,0,3,0,3,0,3,0,0,0,1},
-  {1,0,0,0,0,0,2,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,2,0,0,0,2,0,0,0,0,3,0,0,0,3,0,0,0,1},
-  {1,0,0,0,0,0,2,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,2,2,0,2,2,0,0,0,0,3,0,3,0,3,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,4,4,4,4,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,4,0,4,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,4,0,0,0,0,5,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,4,0,4,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,4,0,4,4,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,4,4,4,4,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
-};
-
 void            my_mlx_pixel_put(t_info_image *img, int x, int y, int color)
 {
     char    *dst;
@@ -50,21 +22,27 @@ void            my_mlx_pixel_put(t_info_image *img, int x, int y, int color)
     *(unsigned int *)dst = color;
 }
 
+unsigned int            take_pixel_from_texture(t_info_image *img, int x, int y)
+{
+    unsigned int color;
+    char    *dst;
+
+    dst = img->addr + (y * img->line_length + x * (img->bits_per_pixel / 8));
+    // *(unsigned int *)dst = color;
+    color = *(unsigned int *)dst;
+    return (color);
+}
+
 int threatment_color(int r, int g, int b)
 {
   return (r << 16 | g << 8 | b);
 }
 
-void drawBuffer(unsigned int *buffer)
-{
-
-}
-
 int rebuild_scene(t_object_on_scene *objects)
 {
     // mlx_destroy_image(objects->mlx, objects->window.img);
-    int h = screenHeight;
-    int w = screenWidth;
+    int h = objects->s_value_from_map.resolution_y;
+    int w = objects->s_value_from_map.resolution_x;
     for (int x = 0; x < w; x++)
     {
       //calculate ray position and direction
@@ -125,6 +103,7 @@ int rebuild_scene(t_object_on_scene *objects)
         else
         {
           sideDistY += deltaDistY;
+
           mapY += stepY;
           side = 1; // попадание по X
         }
@@ -139,84 +118,71 @@ int rebuild_scene(t_object_on_scene *objects)
       //Calculate distance projected on camera direction (Euclidean distance will give fisheye effect!)
       if (side == 0) perpWallDist = (mapX - objects->player_position_x + (1 - stepX) / 2) / rayDirX;
       else          perpWallDist = (mapY - objects->player_position_y + (1 - stepY) / 2) / rayDirY;
-
-      // int a = mapWidth * mapWidth * mapWidth;
-      // else if (side == 0)
-      //   color = 0xFFFFFF;
-      // else if (side == 1)
-      //   color = 0x000000;
-      // printf("worldMap: %d\n", worldMap[mapY][mapX]);
-      // else
-      //   color = 0x000000;
-
       //Calculate height of line to draw on screen
       int lineHeight = (int)(h / perpWallDist);
 
       //calculate lowest and highest pixel to fill in current stripe
       int drawStart = -lineHeight / 2 + h / 2;
-      if(drawStart < 0) drawStart = 0;
+      if (drawStart < 0) drawStart = 0;
       int drawEnd = lineHeight / 2 + h / 2;
-      if(drawEnd >= h) drawEnd = h - 1;
+      if (drawEnd >= h) drawEnd = h - 1;
+
+      //calculate value of wallX
+      double wallX; //where exactly the wall was hit
+      if (side == 0) wallX = objects->player_position_y + perpWallDist * rayDirY;
+      else           wallX = objects->player_position_x + perpWallDist * rayDirX;
+      wallX -= floor((wallX));
+
+      //x coordinate on the texture
+      int texX = (int)(wallX * (double)(texWidth));
+      if(side == 0 && rayDirX > 0) texX = texWidth - texX - 1;
+      if(side == 1 && rayDirY < 0) texX = texWidth - texX - 1;
+
+      double step = 1.0 * texHeight / lineHeight;
+      // Starting texture coordinate
+      double texPos = (drawStart - h / 2 + lineHeight / 2) * step;
       for (int y = 0; y < h; y++)
       {
-        if (y < drawStart)
+        if (y < drawStart) // потолок
           my_mlx_pixel_put(&objects->window, x, y, threatment_color(objects->s_value_from_map.ceilling_color_r, objects->s_value_from_map.ceilling_color_g, objects->s_value_from_map.ceilling_color_b));
-        if (y >= drawStart && y <= drawEnd)
+        if (y > drawStart + 5 && y < drawEnd - 5)
         {
+          //y coordinate on the texture
+          int texY = (int)texPos & (texHeight - 1);
+          texPos += step;
+          // unsigned int color = take_pixel_from_texture(&objects->texture_north, texX, texY);
+          // int color = (int)(objects->texture.addr[/*texHeight * texY + texX*/y * objects->texture.line_length + x * (objects->texture.bits_per_pixel / 8)]);
+          // printf("%d\n", texHeight * texY + texX);
           if (side == 0) // N OR S
           {
             if (stepX > 0)
-              my_mlx_pixel_put(&objects->window, x, y, 0x808080);
+            {
+              unsigned int color = take_pixel_from_texture(&objects->texture_north, texX, texY);
+              my_mlx_pixel_put(&objects->window, x, y, color);
+            }
             else if (stepX < 0)
-               my_mlx_pixel_put(&objects->window, x, y, 0xFF0000);
+            {
+              unsigned int color = take_pixel_from_texture(&objects->texture_south, texX, texY);
+               my_mlx_pixel_put(&objects->window, x, y, color);
+            }
           }
           else if (side == 1) // W OR E
           {
             if (stepY > 0)
-              my_mlx_pixel_put(&objects->window, x, y, 0x0000FF);
+            {
+              unsigned int color = take_pixel_from_texture(&objects->texture_east, texX, texY);
+              my_mlx_pixel_put(&objects->window, x, y, color);
+            }
             else if (stepY < 0)
-              my_mlx_pixel_put(&objects->window, x, y, 0xFFFFFF);
+            {
+              unsigned int color = take_pixel_from_texture(&objects->texture_west, texX, texY);
+              my_mlx_pixel_put(&objects->window, x, y, color);
+            }
           }
         }
-        if (y > drawEnd)
+        if (y > drawEnd) // пол
           my_mlx_pixel_put(&objects->window, x, y, threatment_color(objects->s_value_from_map.floor_color_r, objects->s_value_from_map.floor_color_g, objects->s_value_from_map.floor_color_b));
       }
-      //choose wall color
-      //draw the pixels of the stripe as a vertical line
-
-// //texturing calculations
-//         int texNum = worldMap[mapX][mapY] - 1; //1 subtracted from it so that texture 0 can be used!
-
-//         //calculate value of wallX
-//         double wallX; //where exactly the wall was hit
-//         if (side == 0) wallX = objects->player_position_y + perpWallDist * rayDirY;
-//         else           wallX = objects->player_position_x + perpWallDist * rayDirX;
-//         wallX -= floor((wallX));
-
-//         //x coordinate on the texture
-//         int texX = (int)(wallX * (double)(texWidth));
-//         if(side == 0 && rayDirX > 0) texX = texWidth - texX - 1;
-//         if(side == 1 && rayDirY < 0) texX = texWidth - texX - 1;
-
-//               // How much to increase the texture coordinate per screen pixel
-//         double step = 1.0 * texHeight / lineHeight;
-//         // Starting texture coordinate
-//         double texPos = (drawStart - h / 2 + lineHeight / 2) * step;
-//         for(int y = drawStart; y<drawEnd; y++)
-//         {
-//           // Cast the texture coordinate to integer, and mask with (texHeight - 1) in case of overflow
-//           int texY = (int)texPos & (texHeight - 1);
-//           texPos += step;
-//           unsigned int color = objects->texture[texNum][texHeight * texY + texX];
-//           //make color darker for y-sides: R, G and B byte each divided through two with a "shift" and an "and"
-//           if(side == 1) color = (color >> 1) & 8355711;
-//           objects->buffer[y][x] = color;
-//         }
-
-//       drawBuffer(objects->buffer[0]);
-//       for(int y = 0; y < h; y++)
-//         for(int x = 0; x < w; x++)
-//          objects->buffer[y][x] = 0;
     }
     // printf("x = %f, y = %f\n", objects->player_position_x, objects->player_position_y);
     return (1);
@@ -224,10 +190,15 @@ int rebuild_scene(t_object_on_scene *objects)
 
 int				key_hook(int keycode, t_object_on_scene *obj)
 {
-  // printf("x: %f, y: %f\n", obj->planeX, obj->planeY);
+
+  printf("x: %d\n", keycode);
   // printf("x: %f, y: %f\n", obj->player_direction_x, obj->player_direction_y);
   double moveSpeed = 0.1; //the constant value is in squares/second
   double rotSpeed = 0.05; // speed rotation
+  if (keycode == 257)
+  {
+    moveSpeed = 1;
+  }
   if (keycode == 53)
       exit(1);
   if (keycode == 13) // up
@@ -318,82 +289,63 @@ void  cardinal_points(t_object_on_scene *objects)
   }
 }
 
-int main()
+void take_position_player(t_object_on_scene *objects)
 {
-    int fd = open("map.cub", O_RDONLY);
-    t_object_on_scene objects;
-    objects.map = manage_function(fd, &objects.s_value_from_map);
-
-    void *mlx = mlx_init();
-    void *win = mlx_new_window(mlx, screenWidth, screenHeight, "Cube3D");
-    int h = screenHeight;
-    int w = screenWidth;
-    // while (img[i][j])
-    // {
-    //   while ()
-    //   {
-
-    //   }
-    // }
-    // new
-    // unsigned int buffer[screenHeight][screenWidth];
-    // int texture[8][texWidth * texHeight];
-
-    // unsigned int **buffer = malloc(screenHeight);
-    // for (int i = 0; i < screenHeight; i++)
-    //   buffer[i] = malloc(texWidth * sizeof(unsigned int));
-    // int **texture = malloc(8 * sizeof(int));
-    // for (int i = 0; i < 8 ; i++)
-    //   texture[i] = malloc(texWidth * texHeight);
-
-
-    // objects.buffer = buffer;
-    // objects.texture = texture;
-    // t_info_image window;
-    objects.player_position_x = 22;
-    objects.player_position_y = 12;  //x and y start position
     int i = 0;
     int j = 0;
-    while (objects.map[i] != NULL)
+    while (objects->map[i] != NULL)
     {
-      while (objects.map[i][j] != '\0')
+      while (objects->map[i][j] != '\0')
       {
-        if (objects.map[i][j] == 'N' || objects.map[i][j] == 'W' || objects.map[i][j] == 'E'
-          || objects.map[i][j] == 'S')
+        if (objects->map[i][j] == 'N' || objects->map[i][j] == 'W' || objects->map[i][j] == 'E'
+          || objects->map[i][j] == 'S')
         {
-          objects.player_position_x = i;
-          objects.player_position_y = j;
-          objects.cardinal_point = objects.map[i][j];
+          objects->player_position_x = i;
+          objects->player_position_y = j;
+          objects->cardinal_point = objects->map[i][j];
         }
         j++;
       }
       i++;
       j = 0;
     }
-    objects.map[(int)(objects.player_position_x)][(int)(objects.player_position_y)] = '0';
-    printf("x: %f, y: %f\n", objects.player_position_x, objects.player_position_y);
-    // objects.player_direction_x = 0;
-    // objects.player_direction_y = 1; //initial direction vector
-    // objects.planeX = 0.66;
-    // objects.planeY = 0; //the 2d raycaster version of camera plane
+    objects->map[(int)(objects->player_position_x)][(int)(objects->player_position_y)] = '0';
+}
+
+void convert_xpm_to_image(t_object_on_scene *objects, t_info_image *texture, char *path)
+{
+    char *relative_path = path;//objects->s_value_from_map.north_texture;
+    void *img = mlx_xpm_file_to_image(objects->mlx, relative_path, &texture->width_x, &texture->height_y);
+    if (img != NULL) // если картинка найдена
+    {
+      texture->addr = mlx_get_data_addr(img, &texture->bits_per_pixel,
+          &texture->line_length, &texture->endian);
+    }
+    else
+      objects->s_value_from_map.south_texture = NULL; // проверка на валидность
+}
+
+int main()
+{
+    int fd = open("map.cub", O_RDONLY);
+    t_object_on_scene objects;
+    objects.map = manage_function(fd, &objects.s_value_from_map);
+    objects.mlx = mlx_init();
+    objects.win = mlx_new_window(objects.mlx, objects.s_value_from_map.resolution_x, objects.s_value_from_map.resolution_y, "Cube3D");
+    take_position_player(&objects);
     cardinal_points(&objects);
-    char *relative_path = objects.s_value_from_map.south_texture;
-    int wid;
-    int height;
-    void *img = mlx_xpm_file_to_image(mlx, relative_path, &wid, &height);
     objects.speed = 5;
-    objects.mlx = mlx;
-    objects.win = win;
-    objects.window.img = mlx_new_image(mlx, w, h);
+    objects.window.img = mlx_new_image(objects.mlx, objects.s_value_from_map.resolution_x, objects.s_value_from_map.resolution_y);
        objects.window.addr = mlx_get_data_addr(objects.window.img, &objects.window.bits_per_pixel,
            &objects.window.line_length, &objects.window.endian);
-
-       objects.texture.addr = mlx_get_data_addr(img, &objects.texture.bits_per_pixel,
-           &objects.texture.line_length, &objects.texture.endian);
-           write(1, "1", 1);
+    convert_xpm_to_image(&objects, &objects.texture_north, objects.s_value_from_map.north_texture);
+    convert_xpm_to_image(&objects, &objects.texture_east, objects.s_value_from_map.east_texture);
+    convert_xpm_to_image(&objects, &objects.texture_south, objects.s_value_from_map.south_texture);
+    convert_xpm_to_image(&objects, &objects.texture_west, objects.s_value_from_map.west_texture);
+    convert_xpm_to_image(&objects, &objects.texture_sprite, objects.s_value_from_map.sprite_texture);
     rebuild_scene(&objects);
-    mlx_put_image_to_window(mlx, win, objects.window.img, 0, 0);
-    // mlx_loop_hook(mlx, rebuild_scene, &objects);
-    mlx_hook(win, 2, 1L << 0, key_hook, &objects);
+    mlx_put_image_to_window(objects.mlx, objects.win, objects.window.img, 0, 0);
+    mlx_loop_hook(objects.mlx, rebuild_scene, &objects);
+    mlx_hook(objects.win, 2, 1L << 0, key_hook, &objects);
     mlx_loop(objects.mlx);
 }

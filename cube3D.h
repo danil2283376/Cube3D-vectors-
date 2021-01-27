@@ -6,7 +6,7 @@
 /*   By: scolen <scolen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 15:13:51 by scolen            #+#    #+#             */
-/*   Updated: 2021/01/25 19:01:30 by scolen           ###   ########.fr       */
+/*   Updated: 2021/01/27 14:32:22 by scolen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,11 @@ typedef struct  s_info_image
 
 typedef struct s_object_on_scene
 {
-	t_info_image texture;
+	t_info_image texture_north;
+	t_info_image texture_south;
+	t_info_image texture_west;
+	t_info_image texture_east;
+	t_info_image texture_sprite;
 	t_value_from_map s_value_from_map;
 	t_info_image	player;
 	int				map_hide;
