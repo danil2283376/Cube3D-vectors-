@@ -7,12 +7,8 @@
 
 //place the example code below here:
 
-#define screenWidth 1920
-#define screenHeight 1080
 #define texWidth 64
 #define texHeight 64
-#define mapWidth 24
-#define mapHeight 24
 
 void            my_mlx_pixel_put(t_info_image *img, int x, int y, int color)
 {
@@ -43,6 +39,7 @@ int rebuild_scene(t_object_on_scene *objects)
     // mlx_destroy_image(objects->mlx, objects->window.img);
     int h = objects->s_value_from_map.resolution_y;
     int w = objects->s_value_from_map.resolution_x;
+    int sprite = 0;
     for (int x = 0; x < w; x++)
     {
       //calculate ray position and direction
@@ -103,21 +100,22 @@ int rebuild_scene(t_object_on_scene *objects)
         else
         {
           sideDistY += deltaDistY;
-
           mapY += stepY;
           side = 1; // попадание по X
         }
         //Check if ray has hit a wall
-        if(objects->map[mapX][mapY] != '0')
-        {
-          // printf("worldMap: %d\n", worldMap[mapX][mapY]);
+        if (objects->map[mapX][mapY] == '1')
           hit = 1;
+        if (objects->map[mapX][mapY] == '2')
+        {
+          hit = 1;
+          sprite = 1;
         }
       }
       // printf("stepX: %d, stepY: %d\n", stepX, stepY);
       //Calculate distance projected on camera direction (Euclidean distance will give fisheye effect!)
-      if (side == 0) perpWallDist = (mapX - objects->player_position_x + (1 - stepX) / 2) / rayDirX;
-      else          perpWallDist = (mapY - objects->player_position_y + (1 - stepY) / 2) / rayDirY;
+      if (side == 0)  perpWallDist = (mapX - objects->player_position_x + (1 - stepX) / 2) / rayDirX;
+      else            perpWallDist = (mapY - objects->player_position_y + (1 - stepY) / 2) / rayDirY;
       //Calculate height of line to draw on screen
       int lineHeight = (int)(h / perpWallDist);
 
@@ -145,7 +143,7 @@ int rebuild_scene(t_object_on_scene *objects)
       {
         if (y < drawStart) // потолок
           my_mlx_pixel_put(&objects->window, x, y, threatment_color(objects->s_value_from_map.ceilling_color_r, objects->s_value_from_map.ceilling_color_g, objects->s_value_from_map.ceilling_color_b));
-        if (y > drawStart + 5 && y < drawEnd - 5)
+        if (y > drawStart + 3 && y < drawEnd - 3 && (sprite == 0))
         {
           //y coordinate on the texture
           int texY = (int)texPos & (texHeight - 1);
@@ -183,6 +181,69 @@ int rebuild_scene(t_object_on_scene *objects)
         if (y > drawEnd) // пол
           my_mlx_pixel_put(&objects->window, x, y, threatment_color(objects->s_value_from_map.floor_color_r, objects->s_value_from_map.floor_color_g, objects->s_value_from_map.floor_color_b));
       }
+      // for(int i = 0; i < numSprites; i++)
+      // {
+      //   //translate sprite position to relative to camera
+      //   int num = objects->spriteOrder[i];
+      //   double spriteX = sprite[num].x - posX;
+      //   double spriteY = sprite[spriteOrder[i]].y - posY;
+
+      //   //transform sprite with the inverse camera matrix
+      //   // [ planeX   dirX ] -1                                       [ dirY      -dirX ]
+      //   // [               ]       =  1/(planeX*dirY-dirX*planeY) *   [                 ]
+      //   // [ planeY   dirY ]                                          [ -planeY  planeX ]
+
+      //   double invDet = 1.0 / (objects->planeX * objects->player_direction_y - objects->player_direction_x * objects->planeY); //required for correct matrix multiplication
+
+      //   double transformX = invDet * (objects->player_direction_y * spriteX - objects->player_direction_x * spriteY);
+      //   double transformY = invDet * (-objects->planeY * spriteX + objects->planeX * spriteY); //this is actually the depth inside the screen, that what Z is in 3D
+
+      //   int spriteScreenX = (int)((w / 2) * (1 + transformX / transformY));
+
+      //   //calculate height of the sprite on screen
+      //   int spriteHeight = abs((int)(h / (transformY))); //using 'transformY' instead of the real distance prevents fisheye
+      //   //calculate lowest and highest pixel to fill in current stripe
+      //   int drawStartY = -spriteHeight / 2 + h / 2;
+      //   if(drawStartY < 0) drawStartY = 0;
+      //   int drawEndY = spriteHeight / 2 + h / 2;
+      //   if(drawEndY >= h) drawEndY = h - 1;
+
+      //   //calculate width of the sprite
+      //   int spriteWidth = abs((int)(h / (transformY)));
+      //   int drawStartX = -spriteWidth / 2 + spriteScreenX;
+      //   if(drawStartX < 0) drawStartX = 0;
+      //   int drawEndX = spriteWidth / 2 + spriteScreenX;
+      //   if(drawEndX >= w) drawEndX = w - 1;
+
+      //   //loop through every vertical stripe of the sprite on screen
+      //   for(int stripe = drawStartX; stripe < drawEndX; stripe++)
+      //   {
+      //     int texX = (int)(256 * (stripe - (-spriteWidth / 2 + spriteScreenX)) * texWidth / spriteWidth) / 256;
+      //     //the conditions in the if are:
+      //     //1) it's in front of camera plane so you don't see things behind you
+      //     //2) it's on the screen (left)
+      //     //3) it's on the screen (right)
+      //     //4) ZBuffer, with perpendicular distance
+      //     if(transformY > 0 && stripe > 0 && stripe < w && transformY < ZBuffer[stripe])
+      //     for(int y = drawStartY; y < drawEndY; y++) //for every pixel of the current stripe
+      //     {
+      //       int d = (y) * 256 - h * 128 + spriteHeight * 128; //256 and 128 factors to avoid floats
+      //       int texY = ((d * texHeight) / spriteHeight) / 256;
+      //       unsigned int color = objects->texture_sprite//texture[sprite[spriteOrder[i]].texture][texWidth * texY + texX]; //get current color from the texture
+      //       if((color & 0x00FFFFFF) != 0) buffer[y][stripe] = color; //paint pixel if it isn't black, black is the invisible color
+      //     }
+      //   }
+      // // отрисовка спрайта
+      // for (int y = 0; y < h && (sprite == 1); y++)
+      // {
+      //   if (y < drawStart) // потолок
+      //     my_mlx_pixel_put(&objects->window, x, y, threatment_color(objects->s_value_from_map.ceilling_color_r, objects->s_value_from_map.ceilling_color_g, objects->s_value_from_map.ceilling_color_b));
+
+      //   if (y > drawEnd) // пол
+      //     my_mlx_pixel_put(&objects->window, x, y, threatment_color(objects->s_value_from_map.floor_color_r, objects->s_value_from_map.floor_color_g, objects->s_value_from_map.floor_color_b));
+      // }
+      sprite = 0;
+      // objects->z_buffer[x] = perpWallDist;
     }
     // printf("x = %f, y = %f\n", objects->player_position_x, objects->player_position_y);
     return (1);
@@ -190,7 +251,6 @@ int rebuild_scene(t_object_on_scene *objects)
 
 int				key_hook(int keycode, t_object_on_scene *obj)
 {
-
   printf("x: %d\n", keycode);
   // printf("x: %f, y: %f\n", obj->player_direction_x, obj->player_direction_y);
   double moveSpeed = 0.1; //the constant value is in squares/second
@@ -200,7 +260,10 @@ int				key_hook(int keycode, t_object_on_scene *obj)
     moveSpeed = 1;
   }
   if (keycode == 53)
+  {
+     system("killall afplay");
       exit(1);
+  }
   if (keycode == 13) // up
   {
     // write(1, "1", 1);
@@ -254,13 +317,12 @@ int				key_hook(int keycode, t_object_on_scene *obj)
       obj->planeX = obj->planeX * cos(rotSpeed) - obj->planeY * sin(rotSpeed);
       obj->planeY = oldPlaneX * sin(rotSpeed) + obj->planeY * cos(rotSpeed);
     }
-
-  mlx_destroy_image(obj->mlx, obj->window.img);
-  obj->window.img = mlx_new_image(obj->mlx, screenWidth, screenHeight);
-       obj->window.addr = mlx_get_data_addr(obj->window.img, &obj->window.bits_per_pixel,
-           &obj->window.line_length, &obj->window.endian);
-  rebuild_scene(obj);
-  mlx_put_image_to_window(obj->mlx, obj->win, obj->window.img, 0, 0);
+    mlx_destroy_image(obj->mlx, obj->window.img);
+    obj->window.img = mlx_new_image(obj->mlx, obj->s_value_from_map.resolution_x, obj->s_value_from_map.resolution_y);
+        obj->window.addr = mlx_get_data_addr(obj->window.img, &obj->window.bits_per_pixel,
+            &obj->window.line_length, &obj->window.endian);
+    rebuild_scene(obj);
+    mlx_put_image_to_window(obj->mlx, obj->win, obj->window.img, 0, 0);
   return (1);
 }
 
@@ -325,24 +387,32 @@ void convert_xpm_to_image(t_object_on_scene *objects, t_info_image *texture, cha
       objects->s_value_from_map.south_texture = NULL; // проверка на валидность
 }
 
+void filling_struct_texture(t_object_on_scene *objects)
+{
+  convert_xpm_to_image(objects, &objects->texture_north, objects->s_value_from_map.north_texture);
+  convert_xpm_to_image(objects, &objects->texture_east, objects->s_value_from_map.east_texture);
+  convert_xpm_to_image(objects, &objects->texture_south, objects->s_value_from_map.south_texture);
+  convert_xpm_to_image(objects, &objects->texture_west, objects->s_value_from_map.west_texture);
+  convert_xpm_to_image(objects, &objects->texture_sprite, objects->s_value_from_map.sprite_texture);
+}
+
 int main()
 {
     int fd = open("map.cub", O_RDONLY);
     t_object_on_scene objects;
     objects.map = manage_function(fd, &objects.s_value_from_map);
+    double ZBuffer[objects.s_value_from_map.resolution_x];
+    objects.z_buffer = ZBuffer;
     objects.mlx = mlx_init();
     objects.win = mlx_new_window(objects.mlx, objects.s_value_from_map.resolution_x, objects.s_value_from_map.resolution_y, "Cube3D");
     take_position_player(&objects);
     cardinal_points(&objects);
+    system("afplay DJ_Vasya_Deep_House.mp3 & ");
     objects.speed = 5;
     objects.window.img = mlx_new_image(objects.mlx, objects.s_value_from_map.resolution_x, objects.s_value_from_map.resolution_y);
        objects.window.addr = mlx_get_data_addr(objects.window.img, &objects.window.bits_per_pixel,
            &objects.window.line_length, &objects.window.endian);
-    convert_xpm_to_image(&objects, &objects.texture_north, objects.s_value_from_map.north_texture);
-    convert_xpm_to_image(&objects, &objects.texture_east, objects.s_value_from_map.east_texture);
-    convert_xpm_to_image(&objects, &objects.texture_south, objects.s_value_from_map.south_texture);
-    convert_xpm_to_image(&objects, &objects.texture_west, objects.s_value_from_map.west_texture);
-    convert_xpm_to_image(&objects, &objects.texture_sprite, objects.s_value_from_map.sprite_texture);
+    filling_struct_texture(&objects);
     rebuild_scene(&objects);
     mlx_put_image_to_window(objects.mlx, objects.win, objects.window.img, 0, 0);
     mlx_loop_hook(objects.mlx, rebuild_scene, &objects);

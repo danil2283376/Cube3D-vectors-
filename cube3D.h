@@ -6,7 +6,7 @@
 /*   By: scolen <scolen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 15:13:51 by scolen            #+#    #+#             */
-/*   Updated: 2021/01/27 14:32:22 by scolen           ###   ########.fr       */
+/*   Updated: 2021/01/28 15:19:01 by scolen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,8 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <math.h>
+
+#define numSprites 1
 
 typedef	struct	s_value_from_map
 {
@@ -77,8 +79,9 @@ typedef struct s_object_on_scene
 	float			fov;
 	char			cardinal_point;
 
-	unsigned int **buffer;
-
+	double 			*z_buffer;
+	int spriteOrder[numSprites];
+	double spriteDistance[numSprites];
 
 	t_info_image window;
 	t_info_image floor;
