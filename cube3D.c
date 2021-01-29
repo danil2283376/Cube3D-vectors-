@@ -34,6 +34,126 @@ int threatment_color(int r, int g, int b)
   return (r << 16 | g << 8 | b);
 }
 
+// защитить malloc
+void malloc_array_sprite(t_object_on_scene *objects)
+{
+  objects->pos_sprite_x = malloc(sizeof(float) * objects->quantity_sprite);
+  objects->pos_sprite_y = malloc(sizeof(float) * objects->quantity_sprite);
+}
+
+void search_sprite(t_object_on_scene *objects)
+{
+  int i;
+  int j;
+  int count;
+
+  i = 0;
+  j = 0;
+  count = 0;
+  while (objects->map[i] != NULL)
+  {
+    while (objects->map[i][j] != '\0')
+    {
+        if (objects->map[i][j] == '2')
+        {
+          objects->pos_sprite_x[count] = i + 0.5f;
+          objects->pos_sprite_y[count] = j + 0.5f;
+          count++;
+        }
+        j++;
+    }
+    j = 0;
+    i++;
+  }
+}
+
+void quantity_sprite(t_object_on_scene *objects)
+{
+  int i;
+  int j;
+  int quantity_sprite;
+
+  i = 0;
+  j = 0;
+  quantity_sprite = 0;
+  while (objects->map[i] != NULL)
+  {
+    while (objects->map[i][j] != '\0')
+    {
+        if (objects->map[i][j] == '2')
+          quantity_sprite++;
+        j++;
+    }
+    j = 0;
+    i++;
+  }
+  objects->quantity_sprite = quantity_sprite;
+  malloc_array_sprite(objects);
+  search_sprite(objects);
+}
+
+void  draw_sprite(t_object_on_scene *objects)
+{
+    // quantity_sprite(objects);
+    // search_sprite(objects);
+    //after sorting the sprites, do the projection and draw them
+    for(int i = 0; i < objects->quantity_sprite; i++)
+    {
+      //translate sprite position to relative to camera
+      double spriteX = objects->pos_sprite_x[i] - objects->player_position_x;
+      double spriteY = objects->pos_sprite_y[i] - objects->player_position_y;
+
+      //transform sprite with the inverse camera matrix
+      // [ planeX   dirX ] -1                                       [ dirY      -dirX ]
+      // [               ]       =  1/(planeX*dirY-dirX*planeY) *   [                 ]
+      // [ planeY   dirY ]                                          [ -planeY  planeX ]
+
+      double invDet = 1.0 / (objects->planeX * objects->player_direction_y - objects->player_direction_x * objects->planeY); //required for correct matrix multiplication
+
+      double transformX = invDet * (objects->player_direction_y * spriteX - objects->player_direction_x * spriteY);
+      double transformY = invDet * (-objects->planeY * spriteX + objects->planeX * spriteY); //this is actually the depth inside the screen, that what Z is in 3D
+
+      int spriteScreenX = (int)((objects->s_value_from_map.resolution_x / 2) * (1 + transformX / transformY));
+
+      //calculate height of the sprite on screen
+      int spriteHeight = abs((int)(objects->s_value_from_map.resolution_y / (transformY))); //using 'transformY' instead of the real distance prevents fisheye
+      //calculate lowest and highest pixel to fill in current stripe
+      int drawStartY = -spriteHeight / 2 + objects->s_value_from_map.resolution_y / 2;
+      if(drawStartY < 0) drawStartY = 0;
+      int drawEndY = spriteHeight / 2 + objects->s_value_from_map.resolution_y / 2;
+      if(drawEndY >= objects->s_value_from_map.resolution_y) drawEndY = objects->s_value_from_map.resolution_y - 1;
+
+      //calculate width of the sprite
+      int spriteWidth = abs((int)(objects->s_value_from_map.resolution_y / (transformY)));
+      int drawStartX = -spriteWidth / 2 + spriteScreenX;
+      if(drawStartX < 0) drawStartX = 0;
+      int drawEndX = spriteWidth / 2 + spriteScreenX;
+      if(drawEndX >= objects->s_value_from_map.resolution_x) drawEndX = objects->s_value_from_map.resolution_x - 1;
+      // printf("1\n");
+      //loop through every vertical stripe of the sprite on screen
+      for(int stripe = drawStartX; stripe < drawEndX; stripe++)
+      {
+        int texX = (int)(256 * (stripe - (-spriteWidth / 2 + spriteScreenX)) * texWidth / spriteWidth) / 256;
+        //the conditions in the if are:
+        //1) it's in front of camera plane so you don't see things behind you
+        //2) it's on the screen (left)
+        //3) it's on the screen (right)
+        //4) ZBuffer, with perpendicular distance
+        // printf("1\n");
+        if(transformY > 0 && stripe > 0 && stripe < objects->s_value_from_map.resolution_x)//&& transformY < ZBuffer[stripe])
+        for(int y = drawStartY; y < drawEndY; y++) //for every pixel of the current stripe
+        {
+          // printf("1\n");
+          int d = (y) * 256 - objects->s_value_from_map.resolution_y * 128 + spriteHeight * 128; //256 and 128 factors to avoid floats
+          int texY = ((d * texHeight) / spriteHeight) / 256;
+          int color = take_pixel_from_texture(&objects->texture_sprite, texX, texY);
+          if (color > 0)
+            my_mlx_pixel_put(&objects->window, stripe, y, color); //paint pixel if it isn't black, black is the invisible color
+        }
+      }
+    }
+}
+
 int rebuild_scene(t_object_on_scene *objects)
 {
     // mlx_destroy_image(objects->mlx, objects->window.img);
@@ -106,11 +226,6 @@ int rebuild_scene(t_object_on_scene *objects)
         //Check if ray has hit a wall
         if (objects->map[mapX][mapY] == '1')
           hit = 1;
-        if (objects->map[mapX][mapY] == '2')
-        {
-          hit = 1;
-          sprite = 1;
-        }
       }
       // printf("stepX: %d, stepY: %d\n", stepX, stepY);
       //Calculate distance projected on camera direction (Euclidean distance will give fisheye effect!)
@@ -181,70 +296,8 @@ int rebuild_scene(t_object_on_scene *objects)
         if (y > drawEnd) // пол
           my_mlx_pixel_put(&objects->window, x, y, threatment_color(objects->s_value_from_map.floor_color_r, objects->s_value_from_map.floor_color_g, objects->s_value_from_map.floor_color_b));
       }
-      // for(int i = 0; i < numSprites; i++)
-      // {
-      //   //translate sprite position to relative to camera
-      //   int num = objects->spriteOrder[i];
-      //   double spriteX = sprite[num].x - posX;
-      //   double spriteY = sprite[spriteOrder[i]].y - posY;
-
-      //   //transform sprite with the inverse camera matrix
-      //   // [ planeX   dirX ] -1                                       [ dirY      -dirX ]
-      //   // [               ]       =  1/(planeX*dirY-dirX*planeY) *   [                 ]
-      //   // [ planeY   dirY ]                                          [ -planeY  planeX ]
-
-      //   double invDet = 1.0 / (objects->planeX * objects->player_direction_y - objects->player_direction_x * objects->planeY); //required for correct matrix multiplication
-
-      //   double transformX = invDet * (objects->player_direction_y * spriteX - objects->player_direction_x * spriteY);
-      //   double transformY = invDet * (-objects->planeY * spriteX + objects->planeX * spriteY); //this is actually the depth inside the screen, that what Z is in 3D
-
-      //   int spriteScreenX = (int)((w / 2) * (1 + transformX / transformY));
-
-      //   //calculate height of the sprite on screen
-      //   int spriteHeight = abs((int)(h / (transformY))); //using 'transformY' instead of the real distance prevents fisheye
-      //   //calculate lowest and highest pixel to fill in current stripe
-      //   int drawStartY = -spriteHeight / 2 + h / 2;
-      //   if(drawStartY < 0) drawStartY = 0;
-      //   int drawEndY = spriteHeight / 2 + h / 2;
-      //   if(drawEndY >= h) drawEndY = h - 1;
-
-      //   //calculate width of the sprite
-      //   int spriteWidth = abs((int)(h / (transformY)));
-      //   int drawStartX = -spriteWidth / 2 + spriteScreenX;
-      //   if(drawStartX < 0) drawStartX = 0;
-      //   int drawEndX = spriteWidth / 2 + spriteScreenX;
-      //   if(drawEndX >= w) drawEndX = w - 1;
-
-      //   //loop through every vertical stripe of the sprite on screen
-      //   for(int stripe = drawStartX; stripe < drawEndX; stripe++)
-      //   {
-      //     int texX = (int)(256 * (stripe - (-spriteWidth / 2 + spriteScreenX)) * texWidth / spriteWidth) / 256;
-      //     //the conditions in the if are:
-      //     //1) it's in front of camera plane so you don't see things behind you
-      //     //2) it's on the screen (left)
-      //     //3) it's on the screen (right)
-      //     //4) ZBuffer, with perpendicular distance
-      //     if(transformY > 0 && stripe > 0 && stripe < w && transformY < ZBuffer[stripe])
-      //     for(int y = drawStartY; y < drawEndY; y++) //for every pixel of the current stripe
-      //     {
-      //       int d = (y) * 256 - h * 128 + spriteHeight * 128; //256 and 128 factors to avoid floats
-      //       int texY = ((d * texHeight) / spriteHeight) / 256;
-      //       unsigned int color = objects->texture_sprite//texture[sprite[spriteOrder[i]].texture][texWidth * texY + texX]; //get current color from the texture
-      //       if((color & 0x00FFFFFF) != 0) buffer[y][stripe] = color; //paint pixel if it isn't black, black is the invisible color
-      //     }
-      //   }
-      // // отрисовка спрайта
-      // for (int y = 0; y < h && (sprite == 1); y++)
-      // {
-      //   if (y < drawStart) // потолок
-      //     my_mlx_pixel_put(&objects->window, x, y, threatment_color(objects->s_value_from_map.ceilling_color_r, objects->s_value_from_map.ceilling_color_g, objects->s_value_from_map.ceilling_color_b));
-
-      //   if (y > drawEnd) // пол
-      //     my_mlx_pixel_put(&objects->window, x, y, threatment_color(objects->s_value_from_map.floor_color_r, objects->s_value_from_map.floor_color_g, objects->s_value_from_map.floor_color_b));
-      // }
-      sprite = 0;
-      // objects->z_buffer[x] = perpWallDist;
     }
+    draw_sprite(objects);
     // printf("x = %f, y = %f\n", objects->player_position_x, objects->player_position_y);
     return (1);
 }
@@ -362,8 +415,8 @@ void take_position_player(t_object_on_scene *objects)
         if (objects->map[i][j] == 'N' || objects->map[i][j] == 'W' || objects->map[i][j] == 'E'
           || objects->map[i][j] == 'S')
         {
-          objects->player_position_x = i;
-          objects->player_position_y = j;
+          objects->player_position_x = i + 0.1;
+          objects->player_position_y = j + 0.1;
           objects->cardinal_point = objects->map[i][j];
         }
         j++;
@@ -401,13 +454,12 @@ int main()
     int fd = open("map.cub", O_RDONLY);
     t_object_on_scene objects;
     objects.map = manage_function(fd, &objects.s_value_from_map);
-    double ZBuffer[objects.s_value_from_map.resolution_x];
-    objects.z_buffer = ZBuffer;
     objects.mlx = mlx_init();
     objects.win = mlx_new_window(objects.mlx, objects.s_value_from_map.resolution_x, objects.s_value_from_map.resolution_y, "Cube3D");
     take_position_player(&objects);
     cardinal_points(&objects);
-    system("afplay DJ_Vasya_Deep_House.mp3 & ");
+    // system("afplay DJ_Vasya_Deep_House.mp3 & ");
+    quantity_sprite(&objects);
     objects.speed = 5;
     objects.window.img = mlx_new_image(objects.mlx, objects.s_value_from_map.resolution_x, objects.s_value_from_map.resolution_y);
        objects.window.addr = mlx_get_data_addr(objects.window.img, &objects.window.bits_per_pixel,
@@ -415,7 +467,6 @@ int main()
     filling_struct_texture(&objects);
     rebuild_scene(&objects);
     mlx_put_image_to_window(objects.mlx, objects.win, objects.window.img, 0, 0);
-    mlx_loop_hook(objects.mlx, rebuild_scene, &objects);
     mlx_hook(objects.win, 2, 1L << 0, key_hook, &objects);
     mlx_loop(objects.mlx);
 }

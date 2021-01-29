@@ -6,7 +6,7 @@
 /*   By: scolen <scolen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 15:13:51 by scolen            #+#    #+#             */
-/*   Updated: 2021/01/28 15:19:01 by scolen           ###   ########.fr       */
+/*   Updated: 2021/01/29 14:57:52 by scolen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,9 +79,9 @@ typedef struct s_object_on_scene
 	float			fov;
 	char			cardinal_point;
 
-	double 			*z_buffer;
-	int spriteOrder[numSprites];
-	double spriteDistance[numSprites];
+	int quantity_sprite;
+	float *pos_sprite_x;
+	float *pos_sprite_y;
 
 	t_info_image window;
 	t_info_image floor;
