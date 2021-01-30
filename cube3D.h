@@ -6,7 +6,7 @@
 /*   By: scolen <scolen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 15:13:51 by scolen            #+#    #+#             */
-/*   Updated: 2021/01/29 14:57:52 by scolen           ###   ########.fr       */
+/*   Updated: 2021/01/30 10:59:13 by scolen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,7 @@ typedef struct  s_info_image
 	int			width_x;
 	int			height_y;
 	int			color;
+	float		distance;
 }               t_info_image;
 
 typedef struct s_object_on_scene
@@ -82,6 +83,7 @@ typedef struct s_object_on_scene
 	int quantity_sprite;
 	float *pos_sprite_x;
 	float *pos_sprite_y;
+	t_info_image *struct_array;
 
 	t_info_image window;
 	t_info_image floor;

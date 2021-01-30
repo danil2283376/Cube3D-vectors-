@@ -39,6 +39,7 @@ void malloc_array_sprite(t_object_on_scene *objects)
 {
   objects->pos_sprite_x = malloc(sizeof(float) * objects->quantity_sprite);
   objects->pos_sprite_y = malloc(sizeof(float) * objects->quantity_sprite);
+  objects->struct_array = malloc(sizeof(t_info_image) * objects->quantity_sprite);
 }
 
 void search_sprite(t_object_on_scene *objects)
@@ -67,7 +68,7 @@ void search_sprite(t_object_on_scene *objects)
   }
 }
 
-void quantity_sprite(t_object_on_scene *objects)
+void quantity_sprite1(t_object_on_scene *objects)
 {
   int i;
   int j;
@@ -92,10 +93,67 @@ void quantity_sprite(t_object_on_scene *objects)
   search_sprite(objects);
 }
 
+void  miscalculation_distance(t_object_on_scene *objects)
+{
+  int i;
+
+  i = 0;
+  while (i < objects->quantity_sprite)
+  {
+    objects->struct_array[i].distance = ((objects->player_position_x - objects->pos_sprite_x[i]) * (objects->player_position_x - objects->pos_sprite_x[i])
+      + (objects->player_position_y - objects->pos_sprite_y[i]) * (objects->player_position_y - objects->pos_sprite_y[i]));
+      i++;
+  }
+}
+
+void  sorting_sprite(t_object_on_scene *objects)
+{
+  int i;
+  int j;
+  float tmp;
+  int position;
+
+  i = 0;
+  j = 0;
+  while (i < objects->quantity_sprite)
+  {
+    printf("2\n");
+    while (j < objects->quantity_sprite)
+    {
+      // printf("%d\n", objects->quantity_sprite);
+      // j++;
+      if (objects->struct_array[i].distance > objects->struct_array[j].distance)// && j < objects->quantity_sprite)
+      {
+        // подмена дистанций
+        tmp = objects->struct_array[j].distance;
+        objects->struct_array[j].distance = objects->struct_array[i].distance;
+        objects->struct_array[i].distance = tmp;
+        // подмена x позиций
+        position = objects->pos_sprite_x[i];
+        objects->pos_sprite_x[i] = objects->pos_sprite_x[j];
+        objects->pos_sprite_x[j] = position;
+        // objects->pos_sprite_x[i] += 0.5;
+        // objects->pos_sprite_x[j] += 0.5;
+
+        // подмена y позиций
+        position = objects->pos_sprite_y[i];
+        objects->pos_sprite_y[i] = objects->pos_sprite_y[j];
+        objects->pos_sprite_y[j] = position;
+      }
+      j++;
+    }
+    j = 0;
+    i++;
+  }
+  // while
+}
+
 void  draw_sprite(t_object_on_scene *objects)
 {
-    // quantity_sprite(objects);
-    // search_sprite(objects);
+    miscalculation_distance(objects);
+    sorting_sprite(objects);
+     printf("2\n");
+    write(1, "1", 1);
     //after sorting the sprites, do the projection and draw them
     for(int i = 0; i < objects->quantity_sprite; i++)
     {
@@ -314,8 +372,14 @@ int				key_hook(int keycode, t_object_on_scene *obj)
   }
   if (keycode == 53)
   {
-     system("killall afplay");
-      exit(1);
+    // int i = 0;
+    // while (i < obj->quantity_sprite)
+    // {
+    //   printf("distance: %f\n", obj->struct_array[i].distance);
+    //   i++;
+    // }
+    system("killall afplay");
+    exit(1);
   }
   if (keycode == 13) // up
   {
@@ -459,7 +523,7 @@ int main()
     take_position_player(&objects);
     cardinal_points(&objects);
     // system("afplay DJ_Vasya_Deep_House.mp3 & ");
-    quantity_sprite(&objects);
+    quantity_sprite1(&objects);
     objects.speed = 5;
     objects.window.img = mlx_new_image(objects.mlx, objects.s_value_from_map.resolution_x, objects.s_value_from_map.resolution_y);
        objects.window.addr = mlx_get_data_addr(objects.window.img, &objects.window.bits_per_pixel,
