@@ -150,10 +150,8 @@ void  sorting_sprite(t_object_on_scene *objects)
 
 void  draw_sprite(t_object_on_scene *objects)
 {
-    miscalculation_distance(objects);
-    sorting_sprite(objects);
-     printf("2\n");
-    write(1, "1", 1);
+    // miscalculation_distance(objects);
+    // sorting_sprite(objects);
     //after sorting the sprites, do the projection and draw them
     for(int i = 0; i < objects->quantity_sprite; i++)
     {
@@ -198,7 +196,7 @@ void  draw_sprite(t_object_on_scene *objects)
         //3) it's on the screen (right)
         //4) ZBuffer, with perpendicular distance
         // printf("1\n");
-        if(transformY > 0 && stripe > 0 && stripe < objects->s_value_from_map.resolution_x)//&& transformY < ZBuffer[stripe])
+        if(transformY > 0 && stripe > 0 && stripe < objects->s_value_from_map.resolution_x && transformY < objects->perp_dist[stripe])
         for(int y = drawStartY; y < drawEndY; y++) //for every pixel of the current stripe
         {
           // printf("1\n");
@@ -290,6 +288,7 @@ int rebuild_scene(t_object_on_scene *objects)
       if (side == 0)  perpWallDist = (mapX - objects->player_position_x + (1 - stepX) / 2) / rayDirX;
       else            perpWallDist = (mapY - objects->player_position_y + (1 - stepY) / 2) / rayDirY;
       //Calculate height of line to draw on screen
+      objects->perp_dist[x] = perpWallDist;
       int lineHeight = (int)(h / perpWallDist);
 
       //calculate lowest and highest pixel to fill in current stripe
@@ -513,11 +512,66 @@ void filling_struct_texture(t_object_on_scene *objects)
   convert_xpm_to_image(objects, &objects->texture_sprite, objects->s_value_from_map.sprite_texture);
 }
 
-int main()
+void	filling_file_screenshot(int fd, t_object_on_scene *obj)
 {
-    int fd = open("map.cub", O_RDONLY);
+	int	i;
+	int	j;
+	int	color;
+
+	i = obj->s_value_from_map.resolution_y;
+	while (--i >= 0)
+	{
+		j = -1;
+		while (++j < obj->s_value_from_map.resolution_x)
+		{
+			color = *(int*)(obj->window.addr + (i * obj->window.line_length
+					+ j * (obj->window.bits_per_pixel / 8)));
+			write(fd, &color, 4);
+		}
+	}
+}
+
+void  screenshot(t_object_on_scene *objects)
+{
+  int fd;
+  int size_screen = objects->s_value_from_map.resolution_x * objects->s_value_from_map.resolution_y * 4 + 54;
+  int zero = 0;
+  int pos_pixel_data = 54;
+  short plane = 1;
+  int size = objects->s_value_from_map.resolution_x * objects->s_value_from_map.resolution_y;
+
+  fd = open("screen.bmp", O_CREAT | O_RDWR, 0666);
+  if (fd < 0) // вывод ошибки
+    exit(1);
+  write(fd, "BM", 2);
+  write(fd, &size_screen, 4);
+  write(fd, &zero, 4);
+  write(fd, &pos_pixel_data, 4);
+  pos_pixel_data = 40;
+  write(fd, &pos_pixel_data, 4);
+  write(fd, &objects->s_value_from_map.resolution_x, 4);
+  write(fd, &objects->s_value_from_map.resolution_y, 4);
+  write(fd, &plane, 2);
+  plane = 32;
+  write(fd, &plane, 2);
+  write(fd, &zero, 4);
+  write(fd, &size, 4);
+  size_screen = 1000;
+  write(fd, &size_screen, 4);
+  write(fd, &size_screen, 4);
+  write(fd, &zero, 4);
+  write(fd, &zero, 4);
+  // write(fd, &objects->window, 4);
+
+  filling_file_screenshot(fd, objects);
+}
+
+int main(int argc, char **argv)
+{
     t_object_on_scene objects;
+    int fd = open("map.cub", O_RDONLY);
     objects.map = manage_function(fd, &objects.s_value_from_map);
+    objects.perp_dist = malloc(sizeof(float) * objects.s_value_from_map.resolution_x);
     objects.mlx = mlx_init();
     objects.win = mlx_new_window(objects.mlx, objects.s_value_from_map.resolution_x, objects.s_value_from_map.resolution_y, "Cube3D");
     take_position_player(&objects);
@@ -529,8 +583,16 @@ int main()
        objects.window.addr = mlx_get_data_addr(objects.window.img, &objects.window.bits_per_pixel,
            &objects.window.line_length, &objects.window.endian);
     filling_struct_texture(&objects);
-    rebuild_scene(&objects);
-    mlx_put_image_to_window(objects.mlx, objects.win, objects.window.img, 0, 0);
-    mlx_hook(objects.win, 2, 1L << 0, key_hook, &objects);
-    mlx_loop(objects.mlx);
+    if (argc == 3)
+    {
+      rebuild_scene(&objects);
+      screenshot(&objects);
+    }
+    else
+    {
+      rebuild_scene(&objects);
+      mlx_put_image_to_window(objects.mlx, objects.win, objects.window.img, 0, 0);
+      mlx_hook(objects.win, 2, 1L << 0, key_hook, &objects);
+      mlx_loop(objects.mlx);
+    }
 }

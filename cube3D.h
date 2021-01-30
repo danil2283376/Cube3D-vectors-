@@ -6,7 +6,7 @@
 /*   By: scolen <scolen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 15:13:51 by scolen            #+#    #+#             */
-/*   Updated: 2021/01/30 10:59:13 by scolen           ###   ########.fr       */
+/*   Updated: 2021/01/30 17:40:01 by scolen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,6 +84,7 @@ typedef struct s_object_on_scene
 	float *pos_sprite_x;
 	float *pos_sprite_y;
 	t_info_image *struct_array;
+	float *perp_dist;
 
 	t_info_image window;
 	t_info_image floor;
@@ -100,9 +101,20 @@ typedef struct s_object_on_scene
 	float		ray_max_angle;
 	char		**map;
 	void		*mlx;
-	void        *win;
+	void		*win;
 	int width_bloks_x;
 	int height_bloks_y;
+
+	float		ray_dir_x;
+	float		ray_dir_y;
+	int			pos_map_x;
+	int			pos_map_y;
+	float		delta_dis_x;
+	float		delta_dis_y;
+	int			step_x;
+	int			step_y;
+	float		side_dist_x;
+	float		side_dist_y;
 }				t_object_on_scene;
 
 int			len_number(int number);
