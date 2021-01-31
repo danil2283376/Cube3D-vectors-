@@ -6,7 +6,7 @@
 /*   By: scolen <scolen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 15:13:51 by scolen            #+#    #+#             */
-/*   Updated: 2021/01/30 17:40:01 by scolen           ###   ########.fr       */
+/*   Updated: 2021/01/31 17:23:35 by scolen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <math.h>
-
-#define numSprites 1
+#include <errno.h>
 
 typedef	struct	s_value_from_map
 {
@@ -38,6 +37,7 @@ typedef	struct	s_value_from_map
 	int			ceilling_color_r;
 	int			ceilling_color_g;
 	int			ceilling_color_b;
+	int			valide_map;
 }				t_value_from_map;
 
 typedef struct  s_info_image
@@ -133,3 +133,5 @@ void		standart_value_struct(t_value_from_map *value_map);
 int			value_from_maps_not_null(t_value_from_map *value_map);
 void		paint_map(char **map, t_value_from_map *value_map);
 char		**manage_function(int fd, t_value_from_map *value_map);
+void		validate_map1(t_object_on_scene *objects);
+void		check_valide_map(t_object_on_scene *objects);

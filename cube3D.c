@@ -1,8 +1,3 @@
-#include <math.h>
-#include "minilibx_mms_20200219/mlx.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
 #include "cube3D.h"
 
 #define texWidth 64
@@ -352,12 +347,6 @@ int				key_hook(int keycode, t_object_on_scene *obj)
   double rotSpeed = 0.1; // speed rotation
   if (keycode == 53)
   {
-    // int i = 0;
-    // while (i < obj->quantity_sprite)
-    // {
-    //   printf("distance: %f\n", obj->struct_array[i].distance);
-    //   i++;
-    // }
     system("killall afplay");
     exit(1);
   }
@@ -547,12 +536,30 @@ void  screenshot(t_object_on_scene *objects)
   filling_file_screenshot(fd, objects);
 }
 
+// void  validate_map(t_object_on_scene *objects)
+// {
+//   if (objects->s_value_from_map.ceilling_color_r == -1 ||
+//   objects->s_value_from_map.ceilling_color_g == -1 ||
+//   objects->s_value_from_map.ceilling_color_b == -1 ||
+//   objects->s_value_from_map.floor_color_r == -1 ||
+//   objects->s_value_from_map.floor_color_g == -1 ||
+//   objects->s_value_from_map.floor_color_b == -1)
+// }
+
+int  close_window(t_object_on_scene *objects)
+{
+  mlx_destroy_window(objects->mlx, objects->win);
+  exit(1);
+  return (1);
+}
+
 int main(int argc, char **argv)
 {
     (void)argv;
     t_object_on_scene objects;
     int fd = open("map.cub", O_RDONLY);
     objects.map = manage_function(fd, &objects.s_value_from_map);
+    validate_map1(&objects);
     objects.perp_dist = malloc(sizeof(float) * objects.s_value_from_map.resolution_x);
     objects.mlx = mlx_init();
     objects.win = mlx_new_window(objects.mlx, objects.s_value_from_map.resolution_x, objects.s_value_from_map.resolution_y, "Cube3D");
@@ -573,9 +580,9 @@ int main(int argc, char **argv)
     else
     {
       rebuild_scene(&objects);
-      // write(1, "1", 1);
       mlx_put_image_to_window(objects.mlx, objects.win, objects.window.img, 0, 0);
       mlx_hook(objects.win, 2, 1L << 0, key_hook, &objects);
+      mlx_hook(objects.win, 17, 1L << 0, close_window, &objects);
       mlx_loop(objects.mlx);
     }
 }
