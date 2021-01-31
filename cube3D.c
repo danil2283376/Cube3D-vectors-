@@ -5,8 +5,6 @@
 #include <unistd.h>
 #include "cube3D.h"
 
-//place the example code below here:
-
 #define texWidth 64
 #define texHeight 64
 
@@ -22,9 +20,9 @@ unsigned int            take_pixel_from_texture(t_info_image *img, int x, int y)
 {
     unsigned int color;
     char    *dst;
-
     dst = img->addr + (y * img->line_length + x * (img->bits_per_pixel / 8));
     // *(unsigned int *)dst = color;
+    // write(1, "1", 1);
     color = *(unsigned int *)dst;
     return (color);
 }
@@ -111,17 +109,14 @@ void  sorting_sprite(t_object_on_scene *objects)
   int i;
   int j;
   float tmp;
-  int position;
+  float position;
 
   i = 0;
   j = 0;
   while (i < objects->quantity_sprite)
   {
-    printf("2\n");
     while (j < objects->quantity_sprite)
     {
-      // printf("%d\n", objects->quantity_sprite);
-      // j++;
       if (objects->struct_array[i].distance > objects->struct_array[j].distance)// && j < objects->quantity_sprite)
       {
         // подмена дистанций
@@ -150,19 +145,14 @@ void  sorting_sprite(t_object_on_scene *objects)
 
 void  draw_sprite(t_object_on_scene *objects)
 {
-    // miscalculation_distance(objects);
-    // sorting_sprite(objects);
+    miscalculation_distance(objects);
+    sorting_sprite(objects);
     //after sorting the sprites, do the projection and draw them
     for(int i = 0; i < objects->quantity_sprite; i++)
     {
       //translate sprite position to relative to camera
       double spriteX = objects->pos_sprite_x[i] - objects->player_position_x;
       double spriteY = objects->pos_sprite_y[i] - objects->player_position_y;
-
-      //transform sprite with the inverse camera matrix
-      // [ planeX   dirX ] -1                                       [ dirY      -dirX ]
-      // [               ]       =  1/(planeX*dirY-dirX*planeY) *   [                 ]
-      // [ planeY   dirY ]                                          [ -planeY  planeX ]
 
       double invDet = 1.0 / (objects->planeX * objects->player_direction_y - objects->player_direction_x * objects->planeY); //required for correct matrix multiplication
 
@@ -190,12 +180,7 @@ void  draw_sprite(t_object_on_scene *objects)
       for(int stripe = drawStartX; stripe < drawEndX; stripe++)
       {
         int texX = (int)(256 * (stripe - (-spriteWidth / 2 + spriteScreenX)) * texWidth / spriteWidth) / 256;
-        //the conditions in the if are:
-        //1) it's in front of camera plane so you don't see things behind you
-        //2) it's on the screen (left)
-        //3) it's on the screen (right)
-        //4) ZBuffer, with perpendicular distance
-        // printf("1\n");
+
         if(transformY > 0 && stripe > 0 && stripe < objects->s_value_from_map.resolution_x && transformY < objects->perp_dist[stripe])
         for(int y = drawStartY; y < drawEndY; y++) //for every pixel of the current stripe
         {
@@ -203,6 +188,7 @@ void  draw_sprite(t_object_on_scene *objects)
           int d = (y) * 256 - objects->s_value_from_map.resolution_y * 128 + spriteHeight * 128; //256 and 128 factors to avoid floats
           int texY = ((d * texHeight) / spriteHeight) / 256;
           int color = take_pixel_from_texture(&objects->texture_sprite, texX, texY);
+          // write(1, "1", 1);
           if (color > 0)
             my_mlx_pixel_put(&objects->window, stripe, y, color); //paint pixel if it isn't black, black is the invisible color
         }
@@ -239,7 +225,6 @@ int rebuild_scene(t_object_on_scene *objects)
       //what direction to step in x or y-direction (either +1 or -1)
       int stepX;
       int stepY;
-
       int hit = 0; //was there a wall hit?
       int side; //was a NS or a EW wall hit?
       //calculate step and initial sideDist
@@ -340,12 +325,12 @@ int rebuild_scene(t_object_on_scene *objects)
           {
             if (stepY > 0)
             {
-              unsigned int color = take_pixel_from_texture(&objects->texture_east, texX, texY);
+              unsigned int color = take_pixel_from_texture(&objects->texture_west, texX, texY);
               my_mlx_pixel_put(&objects->window, x, y, color);
             }
             else if (stepY < 0)
             {
-              unsigned int color = take_pixel_from_texture(&objects->texture_west, texX, texY);
+              unsigned int color = take_pixel_from_texture(&objects->texture_east, texX, texY);
               my_mlx_pixel_put(&objects->window, x, y, color);
             }
           }
@@ -361,14 +346,10 @@ int rebuild_scene(t_object_on_scene *objects)
 
 int				key_hook(int keycode, t_object_on_scene *obj)
 {
-  printf("x: %d\n", keycode);
+  // printf("keycode: %d\n", keycode);
   // printf("x: %f, y: %f\n", obj->player_direction_x, obj->player_direction_y);
-  double moveSpeed = 0.1; //the constant value is in squares/second
-  double rotSpeed = 0.05; // speed rotation
-  if (keycode == 257)
-  {
-    moveSpeed = 1;
-  }
+  double moveSpeed = 0.2; //the constant value is in squares/second
+  double rotSpeed = 0.1; // speed rotation
   if (keycode == 53)
   {
     // int i = 0;
@@ -447,23 +428,23 @@ void  cardinal_points(t_object_on_scene *objects)
 {
   if (objects->cardinal_point == 'N') // смотрит вверх
   {
-    objects->player_direction_y = 1;
-    objects->planeX = 0.66;
+    objects->player_direction_x = -1;
+    objects->planeY = 0.66;
   }
   if (objects->cardinal_point == 'S') // смотрит вниз
+  {
+    objects->player_direction_x = 1;
+    objects->planeY = -0.66;
+  }
+  if (objects->cardinal_point == 'W') // смотрет влево
   {
     objects->player_direction_y = -1;
     objects->planeX = -0.66;
   }
-  if (objects->cardinal_point == 'W') // смотрет влево
-  {
-    objects->player_direction_x = -1;
-    objects->planeY = 0.66;
-  }
   if (objects->cardinal_point == 'E') // смотрит вправо
   {
-    objects->player_direction_x = 1;
-    objects->planeY = -0.66;
+    objects->player_direction_y = 1;
+    objects->planeX = 0.66;
   }
 }
 
@@ -568,6 +549,7 @@ void  screenshot(t_object_on_scene *objects)
 
 int main(int argc, char **argv)
 {
+    (void)argv;
     t_object_on_scene objects;
     int fd = open("map.cub", O_RDONLY);
     objects.map = manage_function(fd, &objects.s_value_from_map);
@@ -576,7 +558,7 @@ int main(int argc, char **argv)
     objects.win = mlx_new_window(objects.mlx, objects.s_value_from_map.resolution_x, objects.s_value_from_map.resolution_y, "Cube3D");
     take_position_player(&objects);
     cardinal_points(&objects);
-    // system("afplay DJ_Vasya_Deep_House.mp3 & ");
+    // system("afplay DJ_Vasya_Deep_House.mp3 & "); // музыка
     quantity_sprite1(&objects);
     objects.speed = 5;
     objects.window.img = mlx_new_image(objects.mlx, objects.s_value_from_map.resolution_x, objects.s_value_from_map.resolution_y);
@@ -591,6 +573,7 @@ int main(int argc, char **argv)
     else
     {
       rebuild_scene(&objects);
+      // write(1, "1", 1);
       mlx_put_image_to_window(objects.mlx, objects.win, objects.window.img, 0, 0);
       mlx_hook(objects.win, 2, 1L << 0, key_hook, &objects);
       mlx_loop(objects.mlx);

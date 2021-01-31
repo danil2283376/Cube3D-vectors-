@@ -6,7 +6,7 @@
 /*   By: scolen <scolen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 13:15:09 by scolen            #+#    #+#             */
-/*   Updated: 2021/01/26 14:06:49 by scolen           ###   ########.fr       */
+/*   Updated: 2021/01/31 08:48:32 by scolen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,8 +94,9 @@ char	*threatment_map(char *line, char *map, t_value_from_map *value_map)
 	return (map);
 }
 
-char	**manage_function(int fd, t_value_from_map *value_map)
+char	**manage_function(int fd, t_value_from_map *value_map)//, t_object_on_scene *objects)
 {
+	// write(1, "2", 1);
 	char *line;
 	int is_map1;
 	char *map;
@@ -118,7 +119,8 @@ char	**manage_function(int fd, t_value_from_map *value_map)
 		get_path_south(line, value_map);
 		get_path_west(line, value_map);
 		get_path_east(line, value_map);
-		get_path_sprite(line, value_map);
+		if (is_map1 == 0)
+			get_path_sprite(line, value_map);
 		get_value_color(line, value_map);
 		get_value_color_floor(line, value_map);
 		if (is_map1 == 1)
@@ -141,5 +143,6 @@ char	**manage_function(int fd, t_value_from_map *value_map)
 	// printf("Floor_r = %d\n", value_map->floor_color_r);
 	// printf("Floor_g = %d\n", value_map->floor_color_g);
 	// printf("Floor_b = %d\n", value_map->floor_color_b);
+	// objects->map = ft_split(map, '*');
 	return (matrix_map = ft_split(map, '*'));
 }

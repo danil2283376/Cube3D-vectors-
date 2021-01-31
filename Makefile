@@ -1,5 +1,5 @@
 SRC = $(shell find . -name "ft_*.c") get_next_line/get_next_line.c \
-	get_next_line/get_next_line_utils.c
+	get_next_line/get_next_line_utils.c cube3D.c
 
 OBJC = ${SRS:.c=.o}
 
