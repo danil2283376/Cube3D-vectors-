@@ -6,11 +6,11 @@
 /*   By: scolen <scolen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 13:15:09 by scolen            #+#    #+#             */
-/*   Updated: 2021/01/31 08:48:32 by scolen           ###   ########.fr       */
+/*   Updated: 2021/02/02 19:55:57 by scolen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "/Users/scolen/cube3D/cube3D.h"
+#include "../cube3D.h"
 
 int	string_from_space(char *line, t_value_from_map *value_map)
 {
@@ -82,7 +82,7 @@ char	*threatment_map(char *line, char *map, t_value_from_map *value_map)
 	(void)value_map;
 
 	line_start = 0;
-	new_line = ft_strdup(line);
+	new_line = ft_strdup(line); // утечка
 	while (new_line[line_start] == '\t' || new_line[line_start] == ' ')
 		line_start++;
 	while (new_line[line_start])
@@ -90,13 +90,13 @@ char	*threatment_map(char *line, char *map, t_value_from_map *value_map)
 	new_line[line_start] = '*';
 	new_line[line_start + 1] = '\0';
 	line_start = 0;
-	map = ft_strjoin(map, new_line);
+	map = ft_strjoin(map, new_line); // утечка
+	// value_map->quantity_string++;
 	return (map);
 }
 
-char	**manage_function(int fd, t_value_from_map *value_map)//, t_object_on_scene *objects)
+char	**manage_function(int fd, t_value_from_map *value_map, t_object_on_scene *objects)
 {
-	// write(1, "2", 1);
 	char *line;
 	int is_map1;
 	char *map;
@@ -129,6 +129,7 @@ char	**manage_function(int fd, t_value_from_map *value_map)//, t_object_on_scene
 			map = threatment_map(line, map, value_map);
 			free(ptr);
 		}
+		objects->s_value_from_map.quantity_string_map++;
 		free(line);
 	}
 	// printf("Resolution: x = %d, y = %d\n", value_map->resolution_x, value_map->resolution_y);
@@ -144,5 +145,7 @@ char	**manage_function(int fd, t_value_from_map *value_map)//, t_object_on_scene
 	// printf("Floor_g = %d\n", value_map->floor_color_g);
 	// printf("Floor_b = %d\n", value_map->floor_color_b);
 	// objects->map = ft_split(map, '*');
-	return (matrix_map = ft_split(map, '*'));
+	if (!(matrix_map = ft_split(map, '*')))
+		threatment_error(1, "Huge map!", objects);
+	return (matrix_map);
 }

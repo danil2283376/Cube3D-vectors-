@@ -122,9 +122,6 @@ void  sorting_sprite(t_object_on_scene *objects)
         position = objects->pos_sprite_x[i];
         objects->pos_sprite_x[i] = objects->pos_sprite_x[j];
         objects->pos_sprite_x[j] = position;
-        // objects->pos_sprite_x[i] += 0.5;
-        // objects->pos_sprite_x[j] += 0.5;
-
         // подмена y позиций
         position = objects->pos_sprite_y[i];
         objects->pos_sprite_y[i] = objects->pos_sprite_y[j];
@@ -135,7 +132,6 @@ void  sorting_sprite(t_object_on_scene *objects)
     j = 0;
     i++;
   }
-  // while
 }
 
 void  draw_sprite(t_object_on_scene *objects)
@@ -462,7 +458,7 @@ void take_position_player(t_object_on_scene *objects)
 
 void convert_xpm_to_image(t_object_on_scene *objects, t_info_image *texture, char *path)
 {
-    char *relative_path = path;//objects->s_value_from_map.north_texture;
+    char *relative_path = path;
     void *img = mlx_xpm_file_to_image(objects->mlx, relative_path, &texture->width_x, &texture->height_y);
     if (img != NULL) // если картинка найдена
     {
@@ -470,7 +466,7 @@ void convert_xpm_to_image(t_object_on_scene *objects, t_info_image *texture, cha
           &texture->line_length, &texture->endian);
     }
     else
-      objects->s_value_from_map.south_texture = NULL; // проверка на валидность
+      threatment_error(1, "Not valide path to texture", objects);
 }
 
 void filling_struct_texture(t_object_on_scene *objects)
@@ -536,16 +532,6 @@ void  screenshot(t_object_on_scene *objects)
   filling_file_screenshot(fd, objects);
 }
 
-// void  validate_map(t_object_on_scene *objects)
-// {
-//   if (objects->s_value_from_map.ceilling_color_r == -1 ||
-//   objects->s_value_from_map.ceilling_color_g == -1 ||
-//   objects->s_value_from_map.ceilling_color_b == -1 ||
-//   objects->s_value_from_map.floor_color_r == -1 ||
-//   objects->s_value_from_map.floor_color_g == -1 ||
-//   objects->s_value_from_map.floor_color_b == -1)
-// }
-
 int  close_window(t_object_on_scene *objects)
 {
   mlx_destroy_window(objects->mlx, objects->win);
@@ -553,13 +539,37 @@ int  close_window(t_object_on_scene *objects)
   return (1);
 }
 
+void  standart_value_map(t_object_on_scene *objects)
+{
+  objects->s_value_from_map.resolution_x = -1;
+  objects->s_value_from_map.resolution_y = -1;
+  objects->s_value_from_map.north_texture = NULL;
+  objects->s_value_from_map.south_texture = NULL;
+  objects->s_value_from_map.west_texture = NULL;
+  objects->s_value_from_map.east_texture = NULL;
+  objects->s_value_from_map.sprite_texture = NULL;
+  objects->s_value_from_map.ceilling_color_r = -1;
+  objects->s_value_from_map.ceilling_color_g = -1;
+  objects->s_value_from_map.ceilling_color_b = -1;
+  objects->s_value_from_map.floor_color_r = -1;
+  objects->s_value_from_map.floor_color_g = -1;
+  objects->s_value_from_map.floor_color_b = -1;
+  objects->s_value_from_map.valide_map = 1;
+  objects->s_value_from_map.quantity_string = 0;
+  objects->s_value_from_map.quantity_player = 0;
+  objects->s_value_from_map.quantity_string_map = 0;
+}
+
 int main(int argc, char **argv)
 {
     (void)argv;
     t_object_on_scene objects;
+    standart_value_map(&objects);
     int fd = open("map.cub", O_RDONLY);
-    objects.map = manage_function(fd, &objects.s_value_from_map);
-    validate_map1(&objects);
+    objects.map = manage_function(fd, &objects.s_value_from_map, &objects);
+    printf("quantity_strings: %d\n", objects.s_value_from_map.quantity_string_map);
+    validate_map1(&objects);//, fd, "map.cub");
+    // exit(1);
     objects.perp_dist = malloc(sizeof(float) * objects.s_value_from_map.resolution_x);
     objects.mlx = mlx_init();
     objects.win = mlx_new_window(objects.mlx, objects.s_value_from_map.resolution_x, objects.s_value_from_map.resolution_y, "Cube3D");

@@ -6,7 +6,7 @@
 /*   By: scolen <scolen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 15:13:51 by scolen            #+#    #+#             */
-/*   Updated: 2021/01/31 17:23:35 by scolen           ###   ########.fr       */
+/*   Updated: 2021/02/02 20:42:59 by scolen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,9 @@ typedef	struct	s_value_from_map
 	int			ceilling_color_g;
 	int			ceilling_color_b;
 	int			valide_map;
+	int			quantity_string;
+	int			quantity_player;
+	int			quantity_string_map;
 }				t_value_from_map;
 
 typedef struct  s_info_image
@@ -132,6 +135,7 @@ void		get_value_color_floor(char *line, t_value_from_map *value_map);
 void		standart_value_struct(t_value_from_map *value_map);
 int			value_from_maps_not_null(t_value_from_map *value_map);
 void		paint_map(char **map, t_value_from_map *value_map);
-char		**manage_function(int fd, t_value_from_map *value_map);
-void		validate_map1(t_object_on_scene *objects);
+char		**manage_function(int fd, t_value_from_map *value_map, t_object_on_scene *objects);
+void		validate_map1(t_object_on_scene *objects);//, int fd, char *name_file);
+void		threatment_error(int fd, char *error, t_object_on_scene *objects);
 void		check_valide_map(t_object_on_scene *objects);

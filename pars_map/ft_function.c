@@ -6,11 +6,11 @@
 /*   By: scolen <scolen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/20 12:01:36 by scolen            #+#    #+#             */
-/*   Updated: 2021/01/06 11:37:50 by scolen           ###   ########.fr       */
+/*   Updated: 2021/02/02 19:27:07 by scolen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "/Users/scolen/cube3D/cube3D.h"
+#include "../cube3D.h"
 
 int	len_number(int number)
 {

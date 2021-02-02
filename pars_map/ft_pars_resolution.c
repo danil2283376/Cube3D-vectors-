@@ -6,11 +6,11 @@
 /*   By: scolen <scolen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/20 11:58:12 by scolen            #+#    #+#             */
-/*   Updated: 2021/01/06 11:38:57 by scolen           ###   ########.fr       */
+/*   Updated: 2021/02/02 19:27:16 by scolen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "/Users/scolen/cube3D/cube3D.h"
+#include "../cube3D.h"
 
 static void	continue_get_value_resolution(char *substr, t_value_from_map *value_map)
 {

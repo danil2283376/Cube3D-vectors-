@@ -6,11 +6,11 @@
 /*   By: scolen <scolen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/20 12:10:58 by scolen            #+#    #+#             */
-/*   Updated: 2021/01/06 11:38:43 by scolen           ###   ########.fr       */
+/*   Updated: 2021/02/02 19:26:36 by scolen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "/Users/scolen/cube3D/cube3D.h"
+#include "../cube3D.h"
 
 void	get_path_west(char *line, t_value_from_map *value_map)
 {

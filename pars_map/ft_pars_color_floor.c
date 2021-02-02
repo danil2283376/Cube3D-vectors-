@@ -6,11 +6,11 @@
 /*   By: scolen <scolen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/20 12:32:51 by scolen            #+#    #+#             */
-/*   Updated: 2021/01/06 11:38:48 by scolen           ###   ########.fr       */
+/*   Updated: 2021/02/02 19:26:31 by scolen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "/Users/scolen/cube3D/cube3D.h"
+#include "../cube3D.h"
 
 static int	take_number(char *substr, t_value_from_map *value_map,
 	int quantity_number, int start)
