@@ -1,6 +1,6 @@
 SRC = $(shell find . -name "ft_*.c") get_next_line/get_next_line.c \
 	get_next_line/get_next_line_utils.c cube3D.c validate_map/valide_settings.c \
-	validate_map/valide_map.c
+	validate_map/valide_map.c validate_keys/validate_file_cub.c
 
 OBJC = ${SRS:.c=.o}
 

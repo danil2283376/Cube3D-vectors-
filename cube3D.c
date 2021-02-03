@@ -564,12 +564,13 @@ void  standart_value_map(t_object_on_scene *objects)
 
 int main(int argc, char **argv)
 {
-    (void)argv;
+    // (void)argv;
     t_object_on_scene objects;
     standart_value_map(&objects);
-    int fd = open("map.cub", O_RDONLY);
+    validate_arguments(argv[1], &objects, argc, argv);
+    int fd = open(argv[1], O_RDONLY);
     objects.map = manage_function(fd, &objects.s_value_from_map, &objects);
-    printf("objects->s_value_from_map.quantity_string_before_map: %d\n", objects.s_value_from_map.quantity_string_before_map);
+    // printf("objects->s_value_from_map.quantity_string_before_map: %d\n", objects.s_value_from_map.quantity_string_before_map);
     // printf("quantity_strings: %d\n", objects.s_value_from_map.quantity_string_map);
     validate_map1(&objects, fd, "map.cub");
     // exit(1);

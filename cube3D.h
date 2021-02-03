@@ -6,7 +6,7 @@
 /*   By: scolen <scolen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 15:13:51 by scolen            #+#    #+#             */
-/*   Updated: 2021/02/03 19:09:39 by scolen           ###   ########.fr       */
+/*   Updated: 2021/02/03 20:56:16 by scolen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -141,3 +141,5 @@ char		**manage_function(int fd, t_value_from_map *value_map, t_object_on_scene *
 void		validate_map1(t_object_on_scene *object, int fd, char *name_file);
 void		threatment_error(int fd, char *error, t_object_on_scene *objects);
 void		check_valide_map(t_object_on_scene *objects);
+void		validate_arguments(char *line, t_object_on_scene *objects, int argc, char **argv);
+void		validate_save(char *line, t_object_on_scene *objects);

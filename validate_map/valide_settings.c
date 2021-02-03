@@ -6,7 +6,7 @@
 /*   By: scolen <scolen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/31 12:47:04 by scolen            #+#    #+#             */
-/*   Updated: 2021/02/03 19:45:56 by scolen           ###   ########.fr       */
+/*   Updated: 2021/02/03 21:08:37 by scolen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -139,7 +139,7 @@ void	validate_map1(t_object_on_scene *objects, int fd, char *name_file)
 		objects->s_value_from_map.ceilling_color_b == -1 || objects->s_value_from_map.ceilling_color_b > 255 ||
 		objects->s_value_from_map.floor_color_r == -1 || objects->s_value_from_map.floor_color_r > 255 ||
 		objects->s_value_from_map.floor_color_g == -1 || objects->s_value_from_map.floor_color_g > 255 ||
-		objects->s_value_from_map.floor_color_b == -1 || objects->s_value_from_map.floor_color_r > 255)
+		objects->s_value_from_map.floor_color_b == -1 || objects->s_value_from_map.floor_color_b > 255)
 		threatment_error(1, "Incorrect color!", objects);
 	// if (objects->s_value_from_map.valide_map == -1)
 	// 	threatment_error(1, "Not validate map!", objects);
