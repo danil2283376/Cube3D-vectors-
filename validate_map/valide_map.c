@@ -29,8 +29,13 @@ void	check_vertical_edge(t_object_on_scene *objects)
 	// printf("1) objects->s_value_from_map.valide_map: %d\n", objects->s_value_from_map.valide_map);
 	while (objects->map[0][j] != '\0')
 	{
+		while (objects->map[0][j] == ' ' || objects->map[0][j] == '\t')
+			j++;
 		if (objects->map[0][j] != '1')
+		{
+			printf("%s\n", objects->map[0]);
 			objects->s_value_from_map.valide_map = -1;
+		}
 		j++;
 	}
 	j = 0;
@@ -38,6 +43,8 @@ void	check_vertical_edge(t_object_on_scene *objects)
 	// printf("%s\n", objects->map[objects->s_value_from_map.quantity_string - 1]);
 	while (objects->map[objects->s_value_from_map.quantity_string - 1][j] != '\0')
 	{
+		while (objects->map[0][j] == ' ' || objects->map[0][j] == '\t')
+			j++;
 		if (objects->map[objects->s_value_from_map.quantity_string - 1][j] != '1')
 			objects->s_value_from_map.valide_map = -1;
 			j++;
@@ -85,12 +92,14 @@ void	check_valide_map(t_object_on_scene *objects)
 	{
 		while (objects->map[i][j] != '\0')
 		{
+			if (objects->map[i][j] == '\0')
+				break ;
 			if (objects->map[i][j] == '0' || objects->map[i][j] == '2' ||
 				objects->map[i][j] == 'N' || objects->map[i][j] == 'S' ||
 				objects->map[i][j] == 'W' || objects->map[i][j] == 'E')
 				// printf("HI %c\n", objects->map[i][j]);
 					objects->s_value_from_map.valide_map = check_arround_fill(objects, i, j);
-				printf("%d\n", i);
+				// printf("%d\n", i);
 			j++;
 		}
 		j = 0;

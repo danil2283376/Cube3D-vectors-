@@ -6,7 +6,7 @@
 /*   By: scolen <scolen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 13:15:09 by scolen            #+#    #+#             */
-/*   Updated: 2021/02/02 19:55:57 by scolen           ###   ########.fr       */
+/*   Updated: 2021/02/03 19:15:25 by scolen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ int	string_from_space(char *line, t_value_from_map *value_map)
 	}
 	if (count_space == len_str && line[start] != '\0'/* || line[start + 1] == '\0')*/)
 	{
-		printf("HELL");
+		// printf("HELL");
 		standart_value_struct(value_map);
 		return (1);
 	}
@@ -108,12 +108,13 @@ char	**manage_function(int fd, t_value_from_map *value_map, t_object_on_scene *o
 	while (get_next_line(fd, &line))
 	{
 		is_map1 = is_map(line);
-		if ((is_map1 == 0) && string_from_space(line, value_map) == 1)
-		{
-			standart_value_struct(value_map);
-			free(line);
-			return (NULL);
-		}
+		// if ((is_map1 == 0) && string_from_space(line, value_map) == 1)
+		// {
+		// 	printf("css!");
+		// 	standart_value_struct(value_map);
+		// 	free(line);
+		// 	return (NULL);
+		// }
 		get_value_resolution(line, value_map);
 		get_path_north(line, value_map);
 		get_path_south(line, value_map);
@@ -125,10 +126,13 @@ char	**manage_function(int fd, t_value_from_map *value_map, t_object_on_scene *o
 		get_value_color_floor(line, value_map);
 		if (is_map1 == 1)
 		{
+			objects->s_value_from_map.meet_map = 1;
 			ptr = map;
 			map = threatment_map(line, map, value_map);
 			free(ptr);
 		}
+		if (objects->s_value_from_map.meet_map == 0)
+			objects->s_value_from_map.quantity_string_before_map++;
 		objects->s_value_from_map.quantity_string_map++;
 		free(line);
 	}
@@ -145,6 +149,7 @@ char	**manage_function(int fd, t_value_from_map *value_map, t_object_on_scene *o
 	// printf("Floor_g = %d\n", value_map->floor_color_g);
 	// printf("Floor_b = %d\n", value_map->floor_color_b);
 	// objects->map = ft_split(map, '*');
+	write(1, "1", 1);
 	if (!(matrix_map = ft_split(map, '*')))
 		threatment_error(1, "Huge map!", objects);
 	return (matrix_map);

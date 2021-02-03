@@ -6,7 +6,7 @@
 /*   By: scolen <scolen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/20 12:07:26 by scolen            #+#    #+#             */
-/*   Updated: 2021/02/02 19:26:49 by scolen           ###   ########.fr       */
+/*   Updated: 2021/02/03 17:23:40 by scolen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@ void	get_path_north(char *line, t_value_from_map *value_map)
 	start = 0;
 	if (NULL != substr && ft_strncmp(substr, "NO", 3))
 	{
+		// printf("%s LOL\n", substr);
 		quantity_no++;
 		if (quantity_no == 1)
 		{
