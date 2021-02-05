@@ -6,7 +6,7 @@
 /*   By: scolen <scolen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 13:15:09 by scolen            #+#    #+#             */
-/*   Updated: 2021/02/03 19:15:25 by scolen           ###   ########.fr       */
+/*   Updated: 2021/02/05 12:13:07 by scolen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,6 +80,7 @@ char	*threatment_map(char *line, char *map, t_value_from_map *value_map)
 	int line_start;
 	char *new_line;
 	(void)value_map;
+	char *leaks;
 
 	line_start = 0;
 	new_line = ft_strdup(line); // утечка
@@ -87,10 +88,15 @@ char	*threatment_map(char *line, char *map, t_value_from_map *value_map)
 		line_start++;
 	while (new_line[line_start])
 		line_start++;
-	new_line[line_start] = '*';
-	new_line[line_start + 1] = '\0';
+	// new_line[line_start] = '*';
+	leaks = new_line;
+	new_line = ft_strjoin(new_line, "*");
+	free(leaks);
+	// new_line[line_start + 1] = '\0';
 	line_start = 0;
+	leaks = new_line;
 	map = ft_strjoin(map, new_line); // утечка
+	free(leaks);
 	// value_map->quantity_string++;
 	return (map);
 }
@@ -100,11 +106,13 @@ char	**manage_function(int fd, t_value_from_map *value_map, t_object_on_scene *o
 	char *line;
 	int is_map1;
 	char *map;
-	char **matrix_map;
+	// char **matrix_map;
 	char *ptr;
+	// char *leaks;
 
 	is_map1 = 0;
 	map = ft_strdup("");
+	// leaks = map;
 	while (get_next_line(fd, &line))
 	{
 		is_map1 = is_map(line);
@@ -149,8 +157,12 @@ char	**manage_function(int fd, t_value_from_map *value_map, t_object_on_scene *o
 	// printf("Floor_g = %d\n", value_map->floor_color_g);
 	// printf("Floor_b = %d\n", value_map->floor_color_b);
 	// objects->map = ft_split(map, '*');
-	write(1, "1", 1);
-	if (!(matrix_map = ft_split(map, '*')))
+	// write(1, "1", 1);
+	// leaks = map;
+	// free(map);
+	if (!(objects->map = ft_split(map, '*')))
 		threatment_error(1, "Huge map!", objects);
-	return (matrix_map);
+	free(map);
+	free(line);
+	return (objects->map);
 }

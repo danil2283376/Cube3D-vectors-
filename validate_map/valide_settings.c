@@ -6,7 +6,7 @@
 /*   By: scolen <scolen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/31 12:47:04 by scolen            #+#    #+#             */
-/*   Updated: 2021/02/03 21:08:37 by scolen           ###   ########.fr       */
+/*   Updated: 2021/02/05 12:21:17 by scolen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,8 @@ void	check_string_after_map(t_object_on_scene *objects, int fd, char *name_file)
 	i = 0;
 	close(fd);
 	fd1 = open(name_file, O_RDONLY);
+	if (fd1 == -1)
+		threatment_error(1, "Not exist file!", objects);
 	while (get_next_line(fd1, &line))
 	{
 		if (i != objects->s_value_from_map.quantity_string_map)

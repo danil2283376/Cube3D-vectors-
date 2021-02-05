@@ -564,23 +564,20 @@ void  standart_value_map(t_object_on_scene *objects)
 
 int main(int argc, char **argv)
 {
-    // (void)argv;
     t_object_on_scene objects;
     standart_value_map(&objects);
     validate_arguments(argv[1], &objects, argc, argv);
     int fd = open(argv[1], O_RDONLY);
-    objects.map = manage_function(fd, &objects.s_value_from_map, &objects);
-    // printf("objects->s_value_from_map.quantity_string_before_map: %d\n", objects.s_value_from_map.quantity_string_before_map);
-    // printf("quantity_strings: %d\n", objects.s_value_from_map.quantity_string_map);
-    validate_map1(&objects, fd, "map.cub");
-    // exit(1);
+    if (fd == -1)
+      threatment_error(1, "Not exist file!", &objects);
+    manage_function(fd, &objects.s_value_from_map, &objects);
+    validate_map1(&objects, fd, argv[1]);
     objects.perp_dist = malloc(sizeof(float) * objects.s_value_from_map.resolution_x);
     objects.mlx = mlx_init();
-    // printf("%d, %d\n", objects.s_value_from_map.resolution_x, objects.s_value_from_map.resolution_y);
     objects.win = mlx_new_window(objects.mlx, objects.s_value_from_map.resolution_x, objects.s_value_from_map.resolution_y, "Cube3D");
     take_position_player(&objects);
     cardinal_points(&objects);
-    // system("afplay DJ_Vasya_Deep_House.mp3 & "); // музыка
+    system("afplay DJ_Vasya_Deep_House.mp3 & "); // музыка
     quantity_sprite1(&objects);
     objects.speed = 5;
     objects.window.img = mlx_new_image(objects.mlx, objects.s_value_from_map.resolution_x, objects.s_value_from_map.resolution_y);
