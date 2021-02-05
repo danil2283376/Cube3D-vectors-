@@ -6,7 +6,7 @@
 /*   By: scolen <scolen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 15:13:51 by scolen            #+#    #+#             */
-/*   Updated: 2021/02/03 20:56:16 by scolen           ###   ########.fr       */
+/*   Updated: 2021/02/06 00:23:48 by scolen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,16 +110,44 @@ typedef struct s_object_on_scene
 	int width_bloks_x;
 	int height_bloks_y;
 
-	float		ray_dir_x;
-	float		ray_dir_y;
-	int			pos_map_x;
-	int			pos_map_y;
-	float		delta_dis_x;
-	float		delta_dis_y;
+	float		pos_camera_x;
+	float		rdx;
+	float		rdy;
+	int			posmapx;
+	int			posmapy;
+	float		del_dis_x;
+	float		del_dis_y;
 	int			step_x;
 	int			step_y;
 	float		side_dist_x;
 	float		side_dist_y;
+	float		per_wall_dst;
+	int			hit;
+	int			side;
+	int			line_ray;
+	int			start_wall;
+	int			end_wall;
+	float		hit_wall;
+	float		steps_texture;
+	float		texture_pos;
+	float		texture_x;
+	float		texture_y;
+
+	float		position_sprite_x;
+	float		position_sprite_y;
+	float		inverse_matrix;
+	float		transform_pos_x;
+	float		transform_pos_y;
+	int			screen_pos_x;
+	int			sprite_height;
+	int			start_sprite_y;
+	int			end_sprite_y;
+	int			start_sprite_x;
+	int			end_sprite_x;
+	int			width_sprite;
+	int			texture_sprite_x;
+	int			texture_sprite_y;
+	int			color_pixel_sprite;
 }				t_object_on_scene;
 
 int			len_number(int number);
@@ -143,3 +171,22 @@ void		threatment_error(int fd, char *error, t_object_on_scene *objects);
 void		check_valide_map(t_object_on_scene *objects);
 void		validate_arguments(char *line, t_object_on_scene *objects, int argc, char **argv);
 void		validate_save(char *line, t_object_on_scene *objects);
+void		raycast(t_object_on_scene *objects, int x);
+void		paint_wall(t_object_on_scene *objects, int x);
+unsigned int	take_pixel_from_texture(t_info_image *img, int x, int y);
+void			my_mlx_pixel_put(t_info_image *img, int x, int y, int color);
+void			threatment_error(int fd, char *error, t_object_on_scene *objects);
+int				threatment_color(int r, int g, int b);
+void			calculate_start_end_wall(t_object_on_scene *objects);
+void			translate_sprite_pos(t_object_on_scene *objects, int i);
+void			calculate_height_sprite(t_object_on_scene *objects);
+void			calculate_width_sprite(t_object_on_scene *objects);
+void			draw_vertical_line(t_object_on_scene *objects);
+int				key_hook(int keycode, t_object_on_scene *obj);
+int				rebuild_scene(t_object_on_scene *objects);
+void			move_up(t_object_on_scene *obj, float move_speed);
+void			move_down(t_object_on_scene *obj, float move_speed);
+void			move_left(t_object_on_scene *obj, float move_speed);
+void			move_right(t_object_on_scene *obj, float move_speed);
+void			rotation_left(t_object_on_scene *obj, float speed_rotation);
+void			rotation_right(t_object_on_scene *obj, float speed_rotation);

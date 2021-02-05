@@ -1,6 +1,9 @@
 SRC = $(shell find . -name "ft_*.c") get_next_line/get_next_line.c \
 	get_next_line/get_next_line_utils.c cube3D.c validate_map/valide_settings.c \
-	validate_map/valide_map.c validate_keys/validate_file_cub.c
+	validate_map/valide_map.c validate_keys/validate_file_cub.c raycasting/raycast.c \
+	raycasting/draw_scene.c draw_sprite/translate_sprite_pos.c draw_sprite/calculate_pos_sprite.c \
+	draw_sprite/output_vertical_line_sprite.c key_events/key_hook.c key_events/move.c \
+	key_events/rotation.c
 
 OBJC = ${SRS:.c=.o}
 
