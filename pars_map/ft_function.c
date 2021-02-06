@@ -6,13 +6,13 @@
 /*   By: scolen <scolen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/20 12:01:36 by scolen            #+#    #+#             */
-/*   Updated: 2021/02/06 22:24:40 by scolen           ###   ########.fr       */
+/*   Updated: 2021/02/06 22:58:57 by scolen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../cube_three_d.h"
 
-int	len_number(int number)
+int	len_number(long long number)
 {
 	int len;
 

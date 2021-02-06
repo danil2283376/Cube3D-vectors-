@@ -6,7 +6,7 @@
 /*   By: scolen <scolen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/06 21:30:26 by scolen            #+#    #+#             */
-/*   Updated: 2021/02/06 22:24:27 by scolen           ###   ########.fr       */
+/*   Updated: 2021/02/06 23:10:50 by scolen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ void	calculate_dst(t_object_on_scene *objects, int x)
 			2 + objects->line_ray / 2) * objects->steps_texture;
 }
 
-int	rebuild_scene(t_object_on_scene *objects)
+int		rebuild_scene(t_object_on_scene *objects)
 {
 	int x;
 
@@ -50,7 +50,7 @@ int	rebuild_scene(t_object_on_scene *objects)
 	return (1);
 }
 
-int	close_window(t_object_on_scene *objects)
+int		close_window(t_object_on_scene *objects)
 {
 	mlx_destroy_window(objects->mlx, objects->win);
 	exit(1);
@@ -76,7 +76,7 @@ void	init_window(t_object_on_scene *objects)
 	filling_struct_texture(objects);
 }
 
-int	main(int argc, char **argv)
+int		main(int argc, char **argv)
 {
 	t_object_on_scene	objects;
 	int					fd;

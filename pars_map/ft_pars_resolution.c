@@ -6,14 +6,14 @@
 /*   By: scolen <scolen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/20 11:58:12 by scolen            #+#    #+#             */
-/*   Updated: 2021/02/06 22:23:19 by scolen           ###   ########.fr       */
+/*   Updated: 2021/02/06 23:02:21 by scolen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../cube_three_d.h"
 
 static void	numbers(int quantity_number,
-	t_value_from_map *value_map, int number)
+	t_value_from_map *value_map, long long number)
 {
 	if (quantity_number == 0)
 		value_map->resolution_x = number;
@@ -26,9 +26,9 @@ static void	numbers(int quantity_number,
 static void	continue_get_value_resolution(char *substr,
 	t_value_from_map *value_map)
 {
-	int start;
-	int number;
-	int quantity_number;
+	int					start;
+	long long int		number;
+	int					quantity_number;
 
 	start = 1;
 	number = 0;

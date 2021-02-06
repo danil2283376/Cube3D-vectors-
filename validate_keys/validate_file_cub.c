@@ -6,7 +6,7 @@
 /*   By: scolen <scolen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/03 20:19:20 by scolen            #+#    #+#             */
-/*   Updated: 2021/02/06 22:24:10 by scolen           ###   ########.fr       */
+/*   Updated: 2021/02/06 23:13:11 by scolen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,6 @@ void	validate_arguments(char *line, t_object_on_scene *objects,
 		threatment_error(1, "Few arguments!", objects);
 	while (line[i] != '.' && line[i] != '\0')
 		i++;
-	printf("file: %s\n", &line[i]);
 	if (line[i] == '.')
 	{
 		if (line[i + 1] != 'c' || line[i + 2] != 'u' ||
