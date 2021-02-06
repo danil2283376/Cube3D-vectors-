@@ -6,17 +6,17 @@
 /*   By: scolen <scolen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/20 12:06:24 by scolen            #+#    #+#             */
-/*   Updated: 2021/02/02 19:26:40 by scolen           ###   ########.fr       */
+/*   Updated: 2021/02/06 22:23:09 by scolen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../cube3D.h"
+#include "../cube_three_d.h"
 
 void	get_path_sprite(char *line, t_value_from_map *value_map)
 {
-	char *substr;
-	int start;
-	static int quantity_s = 0;
+	char		*substr;
+	int			start;
+	static int	quantity_s = 0;
 
 	substr = ft_strnstr(line, "S", ft_strlen(line));
 	start = 0;
@@ -28,15 +28,12 @@ void	get_path_sprite(char *line, t_value_from_map *value_map)
 			start = start + 2;
 			while (substr[start] == ' ' && substr[start])
 				start++;
-			value_map->sprite_texture = ft_strdup(&substr[start]); // MALLOC!
+			value_map->sprite_texture = ft_strdup(&substr[start]);
 			while (substr[start] != ' ' && substr[start]
 				!= '\t' && substr[start])
 				start++;
-			if (substr[start] == ' ' || substr[start] == '\t')
-				value_map->sprite_texture = NULL;
 		}
 		else if (quantity_s > 2)
 			value_map->sprite_texture = NULL;
 	}
-	// return (quantity_s);
 }

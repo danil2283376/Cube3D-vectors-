@@ -6,11 +6,11 @@
 /*   By: scolen <scolen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/20 12:14:20 by scolen            #+#    #+#             */
-/*   Updated: 2021/02/02 19:26:59 by scolen           ###   ########.fr       */
+/*   Updated: 2021/02/06 22:22:55 by scolen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../cube3D.h"
+#include "../cube_three_d.h"
 
 static int	cont_get_val_color(char *substr, t_value_from_map *value_map,
 	int quantity_number, int start)
@@ -67,7 +67,7 @@ static void	continue_get_val_color(char *substr, t_value_from_map *value_map)
 	}
 }
 
-void	get_value_color(char *line, t_value_from_map *value_map)
+void		get_value_color(char *line, t_value_from_map *value_map)
 {
 	char		*substr;
 	int			start;
@@ -93,5 +93,4 @@ void	get_value_color(char *line, t_value_from_map *value_map)
 			}
 		}
 	}
-	// return (quantity_c);
 }

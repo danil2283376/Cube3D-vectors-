@@ -6,11 +6,11 @@
 /*   By: scolen <scolen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/20 12:01:36 by scolen            #+#    #+#             */
-/*   Updated: 2021/02/02 19:27:07 by scolen           ###   ########.fr       */
+/*   Updated: 2021/02/06 22:24:40 by scolen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../cube3D.h"
+#include "../cube_three_d.h"
 
 int	len_number(int number)
 {
@@ -48,7 +48,7 @@ int	ft_strcmp(const char *str1, const char *str2)
 	return (0);
 }
 
-int		pass_space(char *substr)
+int	pass_space(char *substr)
 {
 	int start;
 

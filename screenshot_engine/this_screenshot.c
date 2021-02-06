@@ -1,23 +1,19 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   take_pixel_from_texture.c                          :+:      :+:    :+:   */
+/*   this_screenshot.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: scolen <scolen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/02/06 11:47:46 by scolen            #+#    #+#             */
-/*   Updated: 2021/02/06 22:24:01 by scolen           ###   ########.fr       */
+/*   Created: 2021/02/06 22:17:53 by scolen            #+#    #+#             */
+/*   Updated: 2021/02/06 22:23:43 by scolen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../cube_three_d.h"
 
-unsigned int	take_pixel_from_texture(t_info_image *img, int x, int y)
+void	is_screenshot(t_object_on_scene *objects)
 {
-	unsigned int	color;
-	char			*dst;
-
-	dst = img->addr + (y * img->line_length + x * (img->bits_per_pixel / 8));
-	color = *(unsigned int *)dst;
-	return (color);
+	rebuild_scene(objects);
+	screenshot(objects);
 }

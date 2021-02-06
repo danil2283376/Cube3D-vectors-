@@ -6,13 +6,13 @@
 /*   By: scolen <scolen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/06 13:47:05 by scolen            #+#    #+#             */
-/*   Updated: 2021/02/06 14:25:42 by scolen           ###   ########.fr       */
+/*   Updated: 2021/02/06 22:22:09 by scolen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../cube3D.h"
+#include "../cube_three_d.h"
 
-void search_sprite(t_object_on_scene *objects)
+void	search_sprite(t_object_on_scene *objects)
 {
 	int i;
 	int j;

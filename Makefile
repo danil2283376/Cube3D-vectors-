@@ -1,5 +1,5 @@
 SRC = $(shell find . -name "ft_*.c") get_next_line/get_next_line.c \
-	get_next_line/get_next_line_utils.c cube3D.c validate_map/valide_settings.c \
+	get_next_line/get_next_line_utils.c cube_three_d.c validate_map/valide_settings.c \
 	validate_map/valide_map.c validate_keys/validate_file_cub.c raycasting/raycast.c \
 	raycasting/draw_scene.c draw_sprite/translate_sprite_pos.c draw_sprite/calculate_pos_sprite.c \
 	draw_sprite/output_vertical_line_sprite.c key_events/key_hook.c key_events/move.c \
@@ -8,12 +8,13 @@ SRC = $(shell find . -name "ft_*.c") get_next_line/get_next_line.c \
 	standart_value_struct/standart_value_map.c standart_value_struct/take_position_player.c \
 	standart_value_struct/cardinal_points.c draw_sprite/miscalculation_distance.c \
 	draw_sprite/sorting_sprite.c draw_sprite/draw_sprite.c draw_sprite/quantity_sprite.c \
-	draw_sprite/search_sprite_in_map.c
+	draw_sprite/search_sprite_in_map.c pars_map/ft_function2.c \
+	screenshot_engine/this_screenshot.c
 
 
 OBJC = ${SRS:.c=.o}
 
-NAME = cube3D.a
+NAME = cube_three_d.a
 
 FLAG = -Wall -Wextra -Werror
 

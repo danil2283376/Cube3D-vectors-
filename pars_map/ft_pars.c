@@ -6,13 +6,13 @@
 /*   By: scolen <scolen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 13:15:09 by scolen            #+#    #+#             */
-/*   Updated: 2021/02/05 12:13:07 by scolen           ###   ########.fr       */
+/*   Updated: 2021/02/06 22:23:23 by scolen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../cube3D.h"
+#include "../cube_three_d.h"
 
-int	string_from_space(char *line, t_value_from_map *value_map)
+int		string_from_space(char *line, t_value_from_map *value_map)
 {
 	int start;
 	int len_str;
@@ -21,42 +21,17 @@ int	string_from_space(char *line, t_value_from_map *value_map)
 	start = 0;
 	count_space = 0;
 	len_str = ft_strlen(line);
-	// printf("str = %s|\n", &line[start]);
 	while (line[start] == ' ' || line[start] == '\t')
 	{
 		count_space++;
 		start++;
 	}
-	if (count_space == len_str && line[start] != '\0'/* || line[start + 1] == '\0')*/)
+	if (count_space == len_str && line[start] != '\0')
 	{
-		// printf("HELL");
 		standart_value_struct(value_map);
 		return (1);
 	}
-	if (((line[start] == 'R')
-		|| (line[start] == 'N' && line[start + 1] == 'O')
-		|| (line[start] == 'S' && line[start + 1] == 'O')
-		|| (line[start] == 'W' && line[start + 1] == 'E')
-		|| (line[start] == 'E' && line[start + 1] == 'A')
-		|| (line[start] == 'S') || (line[start] == 'C')
-		|| (line[start] == 'F')) && line[start] == '\0')
-		{
-			// printf("SHIT, str = %s\n", &line[start]);
-			return (0);
-		}
-	if (count_space > 0 || (line[start] != '\0' && (line[start] != 'R'
-		&& (line[start] != 'N' && line[start + 1] != 'O')
-		&& (line[start] != 'S' && line[start + 1] != 'O')
-		&& (line[start] != 'W' && line[start + 1] != 'E')
-		&& (line[start] != 'E' && line[start + 1] != 'A')
-		&& (line[start] != 'S') && (line[start] != 'C')
-		&& (line[start] != 'F'))))
-		{
-			// standart_value_struct(value_map);
-		return (1);
-		}
-	// printf("SHIT, str = %s\n", &line[start]);
-	return (0);
+	return (return_value(line, start, count_space));
 }
 
 int		is_map(char *line)
@@ -69,97 +44,73 @@ int		is_map(char *line)
 	if (line[start] == '1' || line[start] == '0')
 		return (1);
 	else
-	{
-		// printf("str = %s\n", line);
 		return (0);
-	}
 }
 
-char	*threatment_map(char *line, char *map, t_value_from_map *value_map)
+char	*threatment_map(char *line, char *map)
 {
-	int line_start;
-	char *new_line;
-	(void)value_map;
-	char *leaks;
+	int		line_start;
+	char	*new_line;
+	char	*leaks;
 
 	line_start = 0;
-	new_line = ft_strdup(line); // утечка
+	new_line = ft_strdup(line);
 	while (new_line[line_start] == '\t' || new_line[line_start] == ' ')
 		line_start++;
 	while (new_line[line_start])
 		line_start++;
-	// new_line[line_start] = '*';
 	leaks = new_line;
 	new_line = ft_strjoin(new_line, "*");
 	free(leaks);
-	// new_line[line_start + 1] = '\0';
 	line_start = 0;
 	leaks = new_line;
-	map = ft_strjoin(map, new_line); // утечка
+	map = ft_strjoin(map, new_line);
 	free(leaks);
-	// value_map->quantity_string++;
 	return (map);
 }
 
-char	**manage_function(int fd, t_value_from_map *value_map, t_object_on_scene *objects)
+char	*get_value_from_map(char *line, t_value_from_map *value_map,
+	t_object_on_scene *objects, char *map)
 {
-	char *line;
-	int is_map1;
-	char *map;
-	// char **matrix_map;
 	char *ptr;
-	// char *leaks;
 
-	is_map1 = 0;
+	ptr = NULL;
+	value_map->is_map = is_map(line);
+	get_value_resolution(line, value_map);
+	get_path_north(line, value_map);
+	get_path_south(line, value_map);
+	get_path_west(line, value_map);
+	get_path_east(line, value_map);
+	if (value_map->is_map == 0)
+		get_path_sprite(line, value_map);
+	get_value_color(line, value_map);
+	get_value_color_floor(line, value_map);
+	if (value_map->is_map == 1)
+	{
+		objects->s_value_from_map.meet_map = 1;
+		ptr = map;
+		map = threatment_map(line, map);
+		free(ptr);
+	}
+	return (map);
+}
+
+char	**manage_function(int fd, t_value_from_map *value_map,
+	t_object_on_scene *objects)
+{
+	char	*line;
+	char	*map;
+
+	value_map->is_map = 0;
 	map = ft_strdup("");
-	// leaks = map;
 	while (get_next_line(fd, &line))
 	{
-		is_map1 = is_map(line);
-		// if ((is_map1 == 0) && string_from_space(line, value_map) == 1)
-		// {
-		// 	printf("css!");
-		// 	standart_value_struct(value_map);
-		// 	free(line);
-		// 	return (NULL);
-		// }
-		get_value_resolution(line, value_map);
-		get_path_north(line, value_map);
-		get_path_south(line, value_map);
-		get_path_west(line, value_map);
-		get_path_east(line, value_map);
-		if (is_map1 == 0)
-			get_path_sprite(line, value_map);
-		get_value_color(line, value_map);
-		get_value_color_floor(line, value_map);
-		if (is_map1 == 1)
-		{
-			objects->s_value_from_map.meet_map = 1;
-			ptr = map;
-			map = threatment_map(line, map, value_map);
-			free(ptr);
-		}
+		map = get_value_from_map(line, value_map, objects, map);
 		if (objects->s_value_from_map.meet_map == 0)
 			objects->s_value_from_map.quantity_string_before_map++;
 		objects->s_value_from_map.quantity_string_map++;
 		free(line);
 	}
-	// printf("Resolution: x = %d, y = %d\n", value_map->resolution_x, value_map->resolution_y);
-	// printf("North = %s\n", value_map->north_texture);
-	// printf("South = %s\n", value_map->south_texture);
-	// printf("West = %s\n", value_map->west_texture);
-	// printf("East = %s\n", value_map->east_texture);
-	// printf("Sprite = %s\n", value_map->sprite_texture);
-	// printf("Color_r = %d\n", value_map->ceilling_color_r);
-	// printf("Color_g = %d\n", value_map->ceilling_color_g);
-	// printf("Color_b = %d\n", value_map->ceilling_color_b);
-	// printf("Floor_r = %d\n", value_map->floor_color_r);
-	// printf("Floor_g = %d\n", value_map->floor_color_g);
-	// printf("Floor_b = %d\n", value_map->floor_color_b);
-	// objects->map = ft_split(map, '*');
-	// write(1, "1", 1);
-	// leaks = map;
-	// free(map);
 	if (!(objects->map = ft_split(map, '*')))
 		threatment_error(1, "Huge map!", objects);
 	free(map);

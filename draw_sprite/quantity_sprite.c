@@ -6,11 +6,11 @@
 /*   By: scolen <scolen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/06 13:42:16 by scolen            #+#    #+#             */
-/*   Updated: 2021/02/06 14:26:02 by scolen           ###   ########.fr       */
+/*   Updated: 2021/02/06 22:22:05 by scolen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../cube3D.h"
+#include "../cube_three_d.h"
 
 void	quantity_sprite1(t_object_on_scene *objects)
 {

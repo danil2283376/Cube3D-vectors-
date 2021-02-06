@@ -6,13 +6,25 @@
 /*   By: scolen <scolen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/20 11:58:12 by scolen            #+#    #+#             */
-/*   Updated: 2021/02/03 17:08:06 by scolen           ###   ########.fr       */
+/*   Updated: 2021/02/06 22:23:19 by scolen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../cube3D.h"
+#include "../cube_three_d.h"
 
-static void	continue_get_value_resolution(char *substr, t_value_from_map *value_map)
+static void	numbers(int quantity_number,
+	t_value_from_map *value_map, int number)
+{
+	if (quantity_number == 0)
+		value_map->resolution_x = number;
+	else if (quantity_number == 1)
+		value_map->resolution_y = number;
+	else
+		value_map->resolution_x = -1;
+}
+
+static void	continue_get_value_resolution(char *substr,
+	t_value_from_map *value_map)
 {
 	int start;
 	int number;
@@ -34,23 +46,18 @@ static void	continue_get_value_resolution(char *substr, t_value_from_map *value_
 			value_map->resolution_x = -1;
 			break ;
 		}
-		if (quantity_number == 0)
-			value_map->resolution_x = number;
-		else if (quantity_number == 1)
-			value_map->resolution_y = number;
-		else
-			value_map->resolution_x = -1;
+		numbers(quantity_number, value_map, number);
 		quantity_number++;
 	}
 }
 
-void	get_value_resolution(char *line, t_value_from_map *value_map)
+void		get_value_resolution(char *line, t_value_from_map *value_map)
 {
-	char *substr;
-	int start;
-	int length_number;
-	int number;
-	static int quantity_r = 0;
+	char		*substr;
+	int			start;
+	int			length_number;
+	int			number;
+	static int	quantity_r = 0;
 
 	substr = ft_strnstr(line, "R", ft_strlen(line));
 	start = 0;
@@ -64,5 +71,4 @@ void	get_value_resolution(char *line, t_value_from_map *value_map)
 		else if (quantity_r == 1)
 			continue_get_value_resolution(&substr[start], value_map);
 	}
-	// return (quantity_r);
 }
