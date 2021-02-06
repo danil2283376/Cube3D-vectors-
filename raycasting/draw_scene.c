@@ -6,7 +6,7 @@
 /*   By: scolen <scolen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/05 18:58:26 by scolen            #+#    #+#             */
-/*   Updated: 2021/02/05 20:46:35 by scolen           ###   ########.fr       */
+/*   Updated: 2021/02/06 14:43:16 by scolen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,16 +54,17 @@ void	calculate_start_end_wall(t_object_on_scene *objects)
 	int h;
 
 	h = objects->s_value_from_map.resolution_y;
-/*int drawStart*/objects->start_wall = -objects->line_ray / 2 + h / 2;
-      if (objects->start_wall < 0) objects->start_wall = 0;
-      /*int drawEnd*/objects->end_wall = objects->line_ray / 2 + h / 2;
-      if (objects->end_wall >= h) objects->end_wall = h - 1;
-
-      //calculate value of wallX
-      // double wallX; //where exactly the wall was hit
-      if (objects->side == 0) objects->hit_wall = objects->player_position_y + objects->per_wall_dst * objects->rdy;
-      else           objects->hit_wall = objects->player_position_x + objects->per_wall_dst * objects->rdx;
-      objects->hit_wall -= floor((objects->hit_wall));
+	objects->start_wall = -objects->line_ray / 2 + h / 2;
+	if (objects->start_wall < 0)
+		objects->start_wall = 0;
+	objects->end_wall = objects->line_ray / 2 + h / 2;
+	if (objects->end_wall >= h)
+		objects->end_wall = h - 1;
+	if (objects->side == 0)
+		objects->hit_wall = objects->player_position_y + objects->per_wall_dst * objects->rdy;
+	else
+		objects->hit_wall = objects->player_position_x + objects->per_wall_dst * objects->rdx;
+	objects->hit_wall -= floor((objects->hit_wall));
 }
 
 void	paint_wall(t_object_on_scene *objects, int x)

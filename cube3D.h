@@ -6,7 +6,7 @@
 /*   By: scolen <scolen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 15:13:51 by scolen            #+#    #+#             */
-/*   Updated: 2021/02/06 00:23:48 by scolen           ###   ########.fr       */
+/*   Updated: 2021/02/06 14:23:42 by scolen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,19 +45,19 @@ typedef	struct	s_value_from_map
 	int			meet_map;
 }				t_value_from_map;
 
-typedef struct  s_info_image
+typedef struct	s_info_image
 {
 	void		*mlx;
-    void        *img;
-    char        *addr;
-    int         bits_per_pixel;
-    int         line_length;
-    int			endian;
+	void		*img;
+	char		*addr;
+	int			bits_per_pixel;
+	int			line_length;
+	int			endian;
 	int			width_x;
 	int			height_y;
 	int			color;
 	float		distance;
-}               t_info_image;
+}				t_info_image;
 
 typedef struct s_object_on_scene
 {
@@ -190,3 +190,15 @@ void			move_left(t_object_on_scene *obj, float move_speed);
 void			move_right(t_object_on_scene *obj, float move_speed);
 void			rotation_left(t_object_on_scene *obj, float speed_rotation);
 void			rotation_right(t_object_on_scene *obj, float speed_rotation);
+void			screenshot(t_object_on_scene *objects);
+void			standart_value_map(t_object_on_scene *objects);
+void			filling_struct_texture(t_object_on_scene *objects);
+void			convert_xpm_to_image(t_object_on_scene *objects, t_info_image *texture, char *path);
+void			take_position_player(t_object_on_scene *objects);
+void			cardinal_points(t_object_on_scene *objects);
+void			miscalculation_distance(t_object_on_scene *objects);
+void			sorting_sprite(t_object_on_scene *objects);
+void			draw_sprite(t_object_on_scene *objects);
+void			quantity_sprite1(t_object_on_scene *objects);
+void			search_sprite(t_object_on_scene *objects);
+void			malloc_array_sprite(t_object_on_scene *objects);
