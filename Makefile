@@ -12,6 +12,8 @@ SRC = $(shell find . -name "ft_*.c") get_next_line/get_next_line.c \
 	screenshot_engine/this_screenshot.c
 
 
+EXECUTION = cub3D
+
 OBJC = ${SRS:.c=.o}
 
 NAME = cube_three_d.a
@@ -29,6 +31,7 @@ all: ${NAME}
 
 ${NAME}: ${OBJC} libmlx.dylib
 	ar rc ${NAME} ${OBJC}
+	${GCC} cube_three_d.a cube_three_d.c libmlx.dylib -o ${EXECUTION}
 
 bonus: all
 
@@ -37,6 +40,7 @@ clean:
 
 fclean: clean
 	rm -f ${NAME}
+	rm ${EXECUTION}
 
 re: fclean all
 

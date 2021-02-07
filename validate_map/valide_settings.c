@@ -6,7 +6,7 @@
 /*   By: scolen <scolen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/31 12:47:04 by scolen            #+#    #+#             */
-/*   Updated: 2021/02/06 22:24:20 by scolen           ###   ########.fr       */
+/*   Updated: 2021/02/07 09:55:54 by scolen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,7 +83,7 @@ void	check_string_after_map(t_object_on_scene *objects,
 	i = 0;
 	if (objects->s_value_from_map.quantity_string_map
 		> objects->s_value_from_map.quantity_string_before_map)
-		threatment_error(1, "Error map!2", objects);
+		threatment_error(1, "Error map!", objects);
 }
 
 void	validate_map1(t_object_on_scene *objects, int fd, char *name_file)
@@ -93,13 +93,13 @@ void	validate_map1(t_object_on_scene *objects, int fd, char *name_file)
 	validate_matrix_map(objects);
 	if (objects->s_value_from_map.resolution_x <= 0 ||
 		objects->s_value_from_map.resolution_y <= 0)
-		threatment_error(1, "Incorrect map1!", objects);
+		threatment_error(1, "Incorrect map!", objects);
 	if (objects->s_value_from_map.north_texture == NULL ||
 		objects->s_value_from_map.south_texture == NULL ||
 		objects->s_value_from_map.west_texture == NULL ||
 		objects->s_value_from_map.east_texture == NULL ||
 		objects->s_value_from_map.sprite_texture == NULL)
-		threatment_error(1, "Incorrect map2!", objects);
+		threatment_error(1, "Incorrect map!", objects);
 	if (objects->s_value_from_map.ceilling_color_r == -1 ||
 	objects->s_value_from_map.ceilling_color_r > 255 ||
 		objects->s_value_from_map.ceilling_color_g == -1 ||
